@@ -4,13 +4,15 @@ import { verifyDKIMSignature } from "@zk-email/helpers/dist/dkim";
 import fs from "fs";
 import path from "path";
 
+const artifacts_dir = path.join(__dirname, "../artifacts");
+
 export async function generatePrMergedIntoMainCircuitInputs(
   rawEmail: string,
-  address: string
+  owner: string
 ) {
   const STRING_PRESELECTOR = "Merged #";
-  const MAX_HEADER_PADDED_BYTES = 1024;
-  const MAX_BODY_PADDED_BYTES = 1536;
+  const MAX_HEADER_PADDED_BYTES = 1408;
+  const MAX_BODY_PADDED_BYTES = 2816;
 
   const dkimResult = await verifyDKIMSignature(Buffer.from(rawEmail));
   const emailVerifierInputs = generateCircuitInputs({
@@ -28,20 +30,20 @@ export async function generatePrMergedIntoMainCircuitInputs(
     Number(c)
   );
   const selectorBuffer = Buffer.from(STRING_PRESELECTOR);
-  const usernameIndex =
+  const prIndex =
     Buffer.from(bodyRemaining).indexOf(selectorBuffer) + selectorBuffer.length;
 
   const inputJson = {
     ...emailVerifierInputs,
-    twitter_username_idx: usernameIndex.toString(),
-    address,
+    pr_index: prIndex.toString(),
+    owner,
   };
   return inputJson;
 }
 
 (async function generateInputs() {
   const rawEmail = fs.readFileSync(
-    path.join(__dirname, "./emls/rawEmail.eml"),
+    path.join(__dirname, "../emls/pr.eml"),
     "utf8"
   );
   const address = bytesToBigInt(
@@ -52,5 +54,8 @@ export async function generatePrMergedIntoMainCircuitInputs(
     address
   );
 
-  fs.writeFileSync("./input.json", JSON.stringify(inputJson));
+  // input json path in artifacts
+  const inputJsonPath = path.join(artifacts_dir, "input.json");
+
+  fs.writeFileSync(inputJsonPath, JSON.stringify(inputJson));
 })();
