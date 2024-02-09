@@ -11,10 +11,11 @@ export async function generatePrMergedIntoMainCircuitInputs(
   owner: string
 ) {
   const STRING_PRESELECTOR = "Merged #";
-  const MAX_HEADER_PADDED_BYTES = 1408;
-  const MAX_BODY_PADDED_BYTES = 2816;
+  const MAX_HEADER_PADDED_BYTES = 2048;
+  const MAX_BODY_PADDED_BYTES = 3072;
 
   const dkimResult = await verifyDKIMSignature(Buffer.from(rawEmail));
+
   const emailVerifierInputs = generateCircuitInputs({
     rsaSignature: dkimResult.signature,
     rsaPublicKey: dkimResult.publicKey,
