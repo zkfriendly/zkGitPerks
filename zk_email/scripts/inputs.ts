@@ -6,6 +6,16 @@ import path from "path";
 
 const artifacts_dir = path.join(__dirname, "../artifacts");
 
+function stringFromArray(data: number[]) {
+  var count = data.length;
+  var str = "";
+
+  for (var index = 0; index < count; index += 1)
+    str += String.fromCharCode(data[index]);
+
+  return str;
+}
+
 export async function generatePrMergedIntoMainCircuitInputs(
   rawEmail: string,
   owner: string
@@ -39,6 +49,7 @@ export async function generatePrMergedIntoMainCircuitInputs(
     pr_index: prIndex.toString(),
     owner,
   };
+
   return inputJson;
 }
 

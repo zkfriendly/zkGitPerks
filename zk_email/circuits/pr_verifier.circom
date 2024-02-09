@@ -2,7 +2,7 @@ pragma circom 2.1.5;
 
 include "@zk-email/circuits/email-verifier.circom";
 include "./pr_merged_regex.circom";
-include "./subject_repo_regex.cirom";
+include "./subject_repo_regex.circom";
 
 template PrVerifier(max_header_bytes, max_body_bytes, n, k, pack_size) {
     signal input in_padded[max_header_bytes];
@@ -29,6 +29,12 @@ template PrVerifier(max_header_bytes, max_body_bytes, n, k, pack_size) {
     EV.in_body_len_padded_bytes <== in_body_len_padded_bytes;
     
     pubkey_hash <== EV.pubkey_hash;    
+
+    // verify repo
+    component SR = SubjectRepoRegex(max_header_bytes);
+    SR.msg <== in_padded;
+    log(SR.out);
+    SR.out === 1;
 
     // verify pr merged into main branch
     component PR = PrMergedRegex(max_body_bytes);
