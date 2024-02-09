@@ -21,6 +21,7 @@ export async function generatePrMergedIntoMainCircuitInputs(
   owner: string
 ) {
   const STRING_PRESELECTOR = "Merged #";
+  const TO_SELECTOR = "to:";
   const MAX_HEADER_PADDED_BYTES = 2048;
   const MAX_BODY_PADDED_BYTES = 3072;
 
@@ -37,16 +38,14 @@ export async function generatePrMergedIntoMainCircuitInputs(
     maxBodyLength: MAX_BODY_PADDED_BYTES,
   });
 
-  const bodyRemaining = emailVerifierInputs.in_body_padded!.map((c) =>
-    Number(c)
-  );
-  const selectorBuffer = Buffer.from(STRING_PRESELECTOR);
-  const prIndex =
-    Buffer.from(bodyRemaining).indexOf(selectorBuffer) + selectorBuffer.length;
+  const header = emailVerifierInputs.in_padded.map((x) => Number(x));
+  const selectorBuffer = Buffer.from(TO_SELECTOR);
+  const toIndex =
+    Buffer.from(header).indexOf(selectorBuffer) + selectorBuffer.length;
 
   const inputJson = {
     ...emailVerifierInputs,
-    pr_index: prIndex.toString(),
+    to_index: toIndex.toString(),
     owner,
   };
 
