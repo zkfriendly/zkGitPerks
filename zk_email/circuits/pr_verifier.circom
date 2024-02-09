@@ -1,3 +1,5 @@
+pragma circom 2.1.5;
+
 include "@zk-email/circuits/email-verifier.circom";
 include "./pr_merged_regex.circom";
 
