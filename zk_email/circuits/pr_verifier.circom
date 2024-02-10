@@ -35,7 +35,7 @@ template PrVerifier(max_header_bytes, max_body_bytes, n, k, pack_size) {
 
     signal (repo_name_out, repo_name_reveal[max_header_bytes]) <== SubjectRepoRegex(max_header_bytes)(in_padded);
     log(repo_name_out);
-    // to_regex_out === 1
+    repo_name_out === 1;
 
     signal output repo_name[max_repo_name_packed] <== ShiftAndPackMaskedStr(max_header_bytes, max_repo_name_len, pack_size)(repo_name_reveal, to_index);
 
@@ -43,7 +43,7 @@ template PrVerifier(max_header_bytes, max_body_bytes, n, k, pack_size) {
     component PR = PrMergedRegex(max_body_bytes);
     PR.msg <== in_body_padded;
     log(PR.out);
-    // PR.out === 1;
+    PR.out === 1;
 
     }
 
