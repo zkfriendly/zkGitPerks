@@ -1,3 +1,3 @@
 [submodule "circomlib"]
-	path = libs/circomlib
+	path = zk_email/circuits/circomlib
 	url = https://github.com/iden3/circomlib.git
