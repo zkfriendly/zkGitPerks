@@ -3,6 +3,8 @@ pragma circom 2.1.5;
 include "./@zk-email/circuits/email-verifier.circom";
 include "./pr_merged_regex.circom";
 include "./subject_repo_regex.circom";
+include "circomlib/circuits/poseidon.circom";
+
 
 template PrVerifier(max_header_bytes, max_body_bytes, n, k, pack_size) {
     signal input in_padded[max_header_bytes];
@@ -15,6 +17,7 @@ template PrVerifier(max_header_bytes, max_body_bytes, n, k, pack_size) {
     signal input in_body_len_padded_bytes;
     signal input to_index;
     signal input owner;
+    signal output sig_hash; // to prevent double spending of the same email
 
     // component EV = EmailVerifier(max_header_bytes, max_body_bytes, n, k, 0);
     // EV.in_padded <== in_padded;
@@ -44,6 +47,20 @@ template PrVerifier(max_header_bytes, max_body_bytes, n, k, pack_size) {
     log(PR.out);
     PR.out === 1;
 
+   var k2_chunked_size = k >> 1;
+    if(k % 2 == 1) {
+        k2_chunked_size += 1;
     }
+    signal sig_hash_input[k2_chunked_size];
+    for(var i = 0; i < k2_chunked_size; i++) {
+        if(i==k2_chunked_size-1 && k2_chunked_size % 2 == 1) {
+            sig_hash_input[i] <== signature[2*i];
+        } else {
+            sig_hash_input[i] <== signature[2*i] + (1<<n) * signature[2*i+1];
+        }
+    }
+
+    sig_hash <== Poseidon(k2_chunked_size)(sig_hash_input);
+}
 
 component main = PrVerifier(2048, 3072, 121, 17, 31);
