@@ -1,3 +1,7 @@
 node_modules
 emls
 artifacts
+.venv
+.env
+sindri
+ptau
