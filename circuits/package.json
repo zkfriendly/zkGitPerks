@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "dev": ""
+  },
   "dependencies": {
     "@zk-email/circuits": "^3.2.3",
     "@zk-email/contracts": "^5.0.2",
