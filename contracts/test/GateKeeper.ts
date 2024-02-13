@@ -35,7 +35,9 @@ describe("GateKeeper", () => {
     const GateKeeperFactory = await ethers.getContractFactory("GateKeeper");
     gateKeeper = await GateKeeperFactory.deploy(
       semaphore.address,
-      prVerifier.address
+      prVerifier.address,
+      "0x006c6c6168632d6173722f7968706172676f74707972432d6c616e6964726143",
+      "0x0000000000000000000000000000000000006f6c61682d687469772d65676e65"
     );
     semaphoreContract = semaphore;
 
