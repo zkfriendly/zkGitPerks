@@ -11,8 +11,10 @@ import {
   Semaphore,
   Groth16Verifier,
 } from "../build/typechain";
-import { config } from "../package.json";
+import valid_proof from "./sample_proof/valid_proof.json";
+
 import { ethers } from "hardhat";
+import { BigNumber } from "ethers";
 
 describe("GateKeeper", () => {
   let gateKeeper: GateKeeper;
@@ -46,5 +48,10 @@ describe("GateKeeper", () => {
     expect(gateKeeper.address).to.be.properAddress;
     expect(await gateKeeper.semaphore()).to.be.properAddress;
     expect(await gateKeeper.semaphore()).to.equal(semaphoreContract.address);
+  });
+
+  it("should be able to join with valid proof", async () => {
+    //@ts-ignore
+    await gateKeeper.joinContributorsGroup(...valid_proof.calldata);
   });
 });

@@ -2,13 +2,15 @@
 pragma solidity ^0.8.4;
 
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
-import "./PrVerifier.sol";
+import "./interfaces/IPrVerifier.sol";
 
 contract GateKeeper {
     uint256 public immutable CONTRIBUTOR_GROUP_ID;
     uint256 public immutable INVESTOR_GROUP_ID;
     address public immutable semaphore;
     address public immutable prVerifier;
+
+    error InvalidProof();
 
     constructor(address _semaphore, address _prVerifier) {
         semaphore = _semaphore;
@@ -32,6 +34,18 @@ contract GateKeeper {
             address(this)
         );
         ISemaphore(_semaphore).createGroup(investorsGroupId, 20, address(this));
+    }
+
+    function joinContributorsGroup(
+        uint[2] calldata _pA,
+        uint[2][2] calldata _pB,
+        uint[2] calldata _pC,
+        uint[5] calldata _pubSignals
+    ) external {
+        if (!IPrVerifier(prVerifier).verifyProof(_pA, _pB, _pC, _pubSignals))
+            revert InvalidProof();
+
+        // ISemaphore(semaphore).addMember(CONTRIBUTOR_GROUP_ID, msg.sender);
     }
 
     function sendFeedback(
