@@ -18,10 +18,18 @@ struct Proof {
     uint[5] _pubSignals;
 }
 
+struct Signal {
+    uint256 signal;
+    uint256 scope;
+    uint256 merkleTreeRoot;
+    uint256 nullifierHash;
+    uint256[8] proof;
+}
+
 contract GateKeeper {
     using SafeERC20 for IERC20;
 
-    uint256 public immutable CONTRIBUTOR_GROUP_ID;
+    uint256 public immutable CONTRIBUTORS_GROUP_ID;
     uint256 public immutable DONATORS_GROUP_ID;
     address public immutable semaphore;
     address public immutable groth16verifier;
@@ -63,7 +71,7 @@ contract GateKeeper {
             keccak256(abi.encodePacked(address(this), "DONATOR"))
         );
 
-        CONTRIBUTOR_GROUP_ID = contributorGroupId;
+        CONTRIBUTORS_GROUP_ID = contributorGroupId;
         DONATORS_GROUP_ID = donatorGroupId;
 
         // create groups
@@ -76,7 +84,7 @@ contract GateKeeper {
     }
 
     function isContributor(uint commitment) external view returns (bool) {
-        return isMember[CONTRIBUTOR_GROUP_ID][commitment];
+        return isMember[CONTRIBUTORS_GROUP_ID][commitment];
     }
 
     function isDonator(uint commitment) external view returns (bool) {
@@ -84,12 +92,12 @@ contract GateKeeper {
     }
 
     function joinContributors(Proof calldata proof) external {
-        uint commitment = _validateProof(proof);
-        if (isMember[CONTRIBUTOR_GROUP_ID][commitment])
+        uint commitment = _validateContributionProof(proof); // reverts if invalid
+        if (isMember[CONTRIBUTORS_GROUP_ID][commitment])
             revert CommitmentExists();
-        isMember[CONTRIBUTOR_GROUP_ID][commitment] = true;
+        isMember[CONTRIBUTORS_GROUP_ID][commitment] = true;
         totalContributors++;
-        ISemaphore(semaphore).addMember(CONTRIBUTOR_GROUP_ID, commitment);
+        ISemaphore(semaphore).addMember(CONTRIBUTORS_GROUP_ID, commitment);
     }
 
     function joinDonators(uint commitment) external {
@@ -104,7 +112,28 @@ contract GateKeeper {
         );
     }
 
-    function _validateProof(Proof memory proof) internal returns (uint) {
+    function validateDonatorSignal(Signal calldata signal) external {
+        _validateSignal(DONATORS_GROUP_ID, signal);
+    }
+
+    function validateContributorSignal(Signal calldata signal) external {
+        _validateSignal(CONTRIBUTORS_GROUP_ID, signal);
+    }
+
+    function _validateSignal(uint256 groupId, Signal memory signal) internal {
+        ISemaphore(semaphore).verifyProof(
+            groupId,
+            signal.merkleTreeRoot,
+            signal.signal,
+            signal.nullifierHash,
+            signal.scope,
+            signal.proof
+        );
+    }
+
+    function _validateContributionProof(
+        Proof memory proof
+    ) internal returns (uint) {
         if (
             !IGroth16Verifier(groth16verifier).verifyProof(
                 proof._pA,

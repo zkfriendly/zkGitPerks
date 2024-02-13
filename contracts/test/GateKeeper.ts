@@ -18,6 +18,7 @@ import valid_proof_2 from "./sample_proof/valid_proof_2.json";
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { MockContract, deployMockContract } from "ethereum-waffle";
+import { config } from "../package.json";
 
 describe("GateKeeper", () => {
   let gateKeeper: GateKeeper;
@@ -98,6 +99,108 @@ describe("GateKeeper", () => {
       after = await gateKeeper.totalContributors();
       expect(after).to.equal(before.add(1));
     });
+
+    describe("Signal Validation", () => {
+      it("should validate contributor singal", async () => {
+        const gpId = await gateKeeper.CONTRIBUTORS_GROUP_ID();
+        //@ts-ignore
+        const gp = new Group(gpId);
+
+        //@ts-ignore
+        await gateKeeper.joinContributors(valid_proof_1.calldata);
+        gp.addMember(users[0].commitment);
+
+        const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`;
+        const zkeyFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.zkey`;
+
+        const signal = formatBytes32String("contributor");
+        const scope = 0;
+        const proof = await generateProof(users[0], gp, scope, signal, {
+          wasmFilePath,
+          zkeyFilePath,
+        });
+
+        //@ts-ignore
+        await gateKeeper.validateContributorSignal([
+          signal,
+          scope,
+          proof.merkleTreeRoot,
+          proof.nullifierHash,
+          proof.proof,
+        ]);
+      });
+
+      it("should not allow invalid contributor singal", async () => {
+        const gpId = await gateKeeper.CONTRIBUTORS_GROUP_ID();
+        //@ts-ignore
+        const gp = new Group(gpId);
+
+        //@ts-ignore
+        await gateKeeper.joinContributors(valid_proof_1.calldata);
+        gp.addMember(users[0].commitment);
+
+        const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`;
+        const zkeyFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.zkey`;
+
+        const signal = formatBytes32String("contributor");
+        const scope = 0;
+        const proof = await generateProof(users[0], gp, scope, signal, {
+          wasmFilePath,
+          zkeyFilePath,
+        });
+
+        await expect(
+          //@ts-ignore
+          gateKeeper.validateContributorSignal([
+            formatBytes32String("invalid-signal"),
+            scope,
+            proof.merkleTreeRoot,
+            proof.nullifierHash,
+            proof.proof,
+          ])
+        ).to.be.revertedWith("InvalidProof");
+      });
+
+      it("should not be able to valide a signal more than once", async () => {
+        const gpId = await gateKeeper.CONTRIBUTORS_GROUP_ID();
+        //@ts-ignore
+        const gp = new Group(gpId);
+
+        //@ts-ignore
+        await gateKeeper.joinContributors(valid_proof_1.calldata);
+        gp.addMember(users[0].commitment);
+
+        const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`;
+        const zkeyFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.zkey`;
+
+        const signal = formatBytes32String("contributor");
+        const scope = 0;
+        const proof = await generateProof(users[0], gp, scope, signal, {
+          wasmFilePath,
+          zkeyFilePath,
+        });
+
+        //@ts-ignore
+        await gateKeeper.validateContributorSignal([
+          signal,
+          scope,
+          proof.merkleTreeRoot,
+          proof.nullifierHash,
+          proof.proof,
+        ]);
+
+        await expect(
+          //@ts-ignore
+          gateKeeper.validateContributorSignal([
+            signal,
+            scope,
+            proof.merkleTreeRoot,
+            proof.nullifierHash,
+            proof.proof,
+          ])
+        ).to.be.revertedWith("Semaphore__YouAreUsingTheSameNillifierTwice");
+      });
+    });
   });
 
   describe("Donators", () => {
@@ -110,6 +213,114 @@ describe("GateKeeper", () => {
       const after = await gateKeeper.totalDonators();
 
       expect(after).to.equal(before.add(1));
+    });
+
+    describe("Signal Validation", () => {
+      it("should validate donator singal", async () => {
+        const gpId = await gateKeeper.DONATORS_GROUP_ID();
+        //@ts-ignore
+        const gp = new Group(gpId);
+
+        await token.mock.transferFrom
+          .withArgs(user1.address, gateKeeper.address, donationAmount)
+          .returns(true);
+        await gateKeeper.joinDonators(users[0].commitment);
+        gp.addMember(users[0].commitment);
+
+        const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`;
+        const zkeyFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.zkey`;
+
+        const signal = formatBytes32String("donator");
+        const scope = 0;
+        const proof = await generateProof(users[0], gp, scope, signal, {
+          wasmFilePath,
+          zkeyFilePath,
+        });
+
+        //@ts-ignore
+        await gateKeeper.validateDonatorSignal([
+          signal,
+          scope,
+          proof.merkleTreeRoot,
+          proof.nullifierHash,
+          proof.proof,
+        ]);
+      });
+
+      it("should not allow invalid donator singal", async () => {
+        const gpId = await gateKeeper.DONATORS_GROUP_ID();
+        //@ts-ignore
+        const gp = new Group(gpId);
+
+        await token.mock.transferFrom
+          .withArgs(user1.address, gateKeeper.address, donationAmount)
+          .returns(true);
+        await gateKeeper.joinDonators(users[0].commitment);
+        gp.addMember(users[0].commitment);
+
+        const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`;
+        const zkeyFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.zkey`;
+
+        const signal = formatBytes32String("donator");
+        const scope = 0;
+        const proof = await generateProof(users[0], gp, scope, signal, {
+          wasmFilePath,
+          zkeyFilePath,
+        });
+
+        await expect(
+          //@ts-ignore
+          gateKeeper.validateDonatorSignal([
+            formatBytes32String("invalid-signal"),
+            scope,
+            proof.merkleTreeRoot,
+            proof.nullifierHash,
+            proof.proof,
+          ])
+        ).to.be.revertedWith("InvalidProof");
+      });
+
+      it("should not be able to valide a signal more than once", async () => {
+        const gpId = await gateKeeper.DONATORS_GROUP_ID();
+        //@ts-ignore
+        const gp = new Group(gpId);
+
+        await token.mock.transferFrom
+          .withArgs(user1.address, gateKeeper.address, donationAmount)
+          .returns(true);
+        await gateKeeper.joinDonators(users[0].commitment);
+        gp.addMember(users[0].commitment);
+
+        const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`;
+        const zkeyFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.zkey`;
+
+        const signal = formatBytes32String("donator");
+        const scope = 0;
+        const proof = await generateProof(users[0], gp, scope, signal, {
+          wasmFilePath,
+          zkeyFilePath,
+        });
+
+        //@ts-ignore
+        await gateKeeper.validateDonatorSignal([
+          signal,
+          scope,
+          proof.merkleTreeRoot,
+          proof.nullifierHash,
+          proof.proof,
+        ]);
+
+        await expect(
+          //@ts-ignore
+          gateKeeper.validateDonatorSignal([
+            signal,
+            scope,
+            proof.merkleTreeRoot,
+            proof.nullifierHash,
+            proof.proof,
+          ])
+        ).to.be.revertedWith("Semaphore__YouAreUsingTheSameNillifierTwice");
+      });
     });
   });
 });
