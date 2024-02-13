@@ -10,17 +10,21 @@ import {
   GateKeeper,
   Semaphore,
   Groth16Verifier,
+  IERC20__factory,
 } from "../build/typechain";
 import valid_proof_1 from "./sample_proof/valid_proof_1.json";
 import valid_proof_2 from "./sample_proof/valid_proof_2.json";
 
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
+import { MockContract, deployMockContract } from "ethereum-waffle";
 
 describe("GateKeeper", () => {
   let gateKeeper: GateKeeper;
   let prVerifier: Groth16Verifier;
   let semaphoreContract: Semaphore;
+  let token: MockContract;
+  const donationAmount = ethers.utils.parseEther("1");
   const users: Identity[] = [];
 
   let user1: SignerWithAddress;
@@ -28,6 +32,9 @@ describe("GateKeeper", () => {
 
   beforeEach(async () => {
     [user1, user2] = await ethers.getSigners();
+
+    //@ts-ignore
+    token = await deployMockContract(user1, IERC20__factory.abi);
 
     const { semaphore } = await run("deploy:semaphore", {
       logs: false,
@@ -43,7 +50,8 @@ describe("GateKeeper", () => {
     gateKeeper = await GateKeeperFactory.deploy(
       semaphore.address,
       prVerifier.address,
-      semaphore.address,
+      token.address,
+      donationAmount,
       "0x0000000000000000000000006f614465766974616e2f796c646e656972666b7a",
       "0x0000000000000000000000000000000000000000000000000000000000000000"
     );
@@ -59,29 +67,49 @@ describe("GateKeeper", () => {
     expect(await gateKeeper.semaphore()).to.equal(semaphoreContract.address);
   });
 
-  it("should be able to join with valid proof", async () => {
-    //@ts-ignore
-    await gateKeeper.joinContributors(...valid_proof_1.calldata);
-  });
-
-  it("should not be able to use one email more than once", async () => {
-    //@ts-ignore
-    await gateKeeper.joinContributors(...valid_proof_1.calldata);
-
-    await expect(
+  describe("Contributors", () => {
+    it("should be able to join with valid proof", async () => {
+      const before = await gateKeeper.totalContributors();
       //@ts-ignore
-      gateKeeper.joinContributors(...valid_proof_1.calldata)
-    ).to.be.revertedWithCustomError(gateKeeper, "EmailAlreadyRegistered");
+      await gateKeeper.joinContributors(...valid_proof_1.calldata);
+      const after = await gateKeeper.totalContributors();
+    });
+
+    it("should not be able to use one email more than once", async () => {
+      //@ts-ignore
+      await gateKeeper.joinContributors(...valid_proof_1.calldata);
+
+      await expect(
+        //@ts-ignore
+        gateKeeper.joinContributors(...valid_proof_1.calldata)
+      ).to.be.revertedWith("EmailAlreadyRegistered");
+    });
+
+    it("should allow multiple users to join", async () => {
+      let before = await gateKeeper.totalContributors();
+      //@ts-ignore
+      await gateKeeper.joinContributors(...valid_proof_1.calldata);
+      let after = await gateKeeper.totalContributors();
+      expect(after).to.equal(before.add(1));
+
+      before = after;
+      //@ts-ignore
+      await gateKeeper.joinContributors(...valid_proof_2.calldata);
+      after = await gateKeeper.totalContributors();
+      expect(after).to.equal(before.add(1));
+    });
   });
 
-  it("should allow multiple users to join", async () => {
-    //@ts-ignore
-    await gateKeeper.joinContributors(...valid_proof_1.calldata);
-    //@ts-ignore
-    await gateKeeper.joinContributors(...valid_proof_2.calldata);
-  });
+  describe("Donators", () => {
+    it("should allow users to join by donating", async () => {
+      await token.mock.transferFrom
+        .withArgs(user1.address, gateKeeper.address, donationAmount)
+        .returns(true);
+      const before = await gateKeeper.totalDonators();
+      await gateKeeper.joinDonators(users[0].commitment);
+      const after = await gateKeeper.totalDonators();
 
-  it("should allow users to join by donating", async () => {
-    // await semaphoreContract.joinDonationGroup(;
+      expect(after).to.equal(before.add(1));
+    });
   });
 });

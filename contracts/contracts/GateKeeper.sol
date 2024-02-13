@@ -2,7 +2,8 @@
 pragma solidity ^0.8.4;
 
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
-import "./interfaces/IPrVerifier.sol";
+import "./interfaces/IGroth16Verifier.sol";
+import "./interfaces/IERC20.sol";
 
 // holds repository name packed
 struct Repository {
@@ -11,17 +12,20 @@ struct Repository {
 }
 
 contract GateKeeper {
+    using SafeERC20 for IERC20;
+
     uint256 public immutable CONTRIBUTOR_GROUP_ID;
     uint256 public immutable DONATORS_GROUP_ID;
     address public immutable semaphore;
     address public immutable groth16verifier;
     address public immutable token;
+    uint public immutable donationAmount;
 
     Repository public repository;
     mapping(uint => bool) public emailNullifier;
 
-    uint public totalContributorsVotingPower;
-    uint public totalDonatorsVotingPower;
+    uint public totalContributors;
+    uint public totalDonators;
 
     error InvalidProof();
     error EmailAlreadyRegistered();
@@ -31,6 +35,7 @@ contract GateKeeper {
         address _semaphore,
         address _groth16verifier,
         address _token,
+        uint _donationAmount,
         uint _repoNameChunk1,
         uint _repoNameChunk2
     ) {
@@ -38,6 +43,7 @@ contract GateKeeper {
         groth16verifier = _groth16verifier;
         repository = Repository(_repoNameChunk1, _repoNameChunk2);
         token = _token;
+        donationAmount = _donationAmount;
 
         // generate random group ids
         uint256 contributorGroupId = uint256(
@@ -66,7 +72,7 @@ contract GateKeeper {
         uint[5] calldata _pubSignals
     ) external {
         if (
-            !IPrVerifier(groth16verifier).verifyProof(
+            !IGroth16Verifier(groth16verifier).verifyProof(
                 _pA,
                 _pB,
                 _pC,
@@ -86,7 +92,18 @@ contract GateKeeper {
         emailNullifier[_pubSignals[1]] = true;
         ISemaphore(semaphore).addMember(CONTRIBUTOR_GROUP_ID, _pubSignals[0]);
 
-        totalContributorsVotingPower++;
+        totalContributors++;
+    }
+
+    function joinDonators(uint commitment) external {
+        IERC20(token).safeTransferFrom(
+            msg.sender,
+            address(this),
+            donationAmount
+        );
+        ISemaphore(semaphore).addMember(DONATORS_GROUP_ID, commitment);
+
+        totalDonators++;
     }
 
     function sendFeedback(
