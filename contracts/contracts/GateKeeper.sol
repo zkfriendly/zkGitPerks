@@ -4,18 +4,28 @@ pragma solidity ^0.8.4;
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 
 contract GateKeeper {
+    uint256 public immutable CONTRIBUTOR_GROUP_ID;
+    uint256 public immutable INVESTOR_GROUP_ID;
+
     address public semaphore;
-    uint256 public groupId;
 
-    constructor(address _semaphore, uint256 _groupId) {
-        semaphore = _semaphore;
-        groupId = _groupId;
+    constructor(uint256 _maxDepth) {
+        address _this = address(this);
 
-        ISemaphore(semaphore).createGroup(groupId, address(this));
-    }
+        // generate random group ids
+        uint256 contributorGroupId = uint256(
+            keccak256(abi.encodePacked(_this, "CONTRIBUTOR"))
+        );
+        uint256 investorsGroupId = uint256(
+            keccak256(abi.encodePacked(_this, "INVESTOR"))
+        );
 
-    function joinGroup(uint256 identityCommitment) external {
-        ISemaphore(semaphore).addMember(groupId, identityCommitment);
+        CONTRIBUTOR_GROUP_ID = contributorGroupId;
+        INVESTOR_GROUP_ID = investorsGroupId;
+
+        // create groups
+        ISemaphore(semaphore).createGroup(contributorGroupId, _maxDepth, _this);
+        ISemaphore(semaphore).createGroup(investorsGroupId, _maxDepth, _this);
     }
 
     function sendFeedback(
@@ -25,16 +35,13 @@ contract GateKeeper {
         uint256 merkleTreedepth,
         uint256[8] calldata proof
     ) external {
-        ISemaphore.SemaphoreProof memory semaphoreProof = ISemaphore
-            .SemaphoreProof({
-                merkleTreeDepth: merkleTreedepth,
-                merkleTreeRoot: merkleTreeRoot,
-                nullifier: nullifierHash,
-                message: feedback,
-                scope: groupId,
-                points: proof
-            });
-
-        ISemaphore(semaphore).validateProof(groupId, semaphoreProof);
+        // SemaphoreProof memory semaphoreProof = SemaphoreProof({
+        //     merkleTreeDepth: merkleTreedepth,
+        //     merkleTreeRoot: merkleTreeRoot,
+        //     nullifier: nullifierHash,
+        //     message: feedback,
+        //     scope: groupId,
+        //     points: proof
+        // });
     }
 }
