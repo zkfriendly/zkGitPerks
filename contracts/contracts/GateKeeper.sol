@@ -59,7 +59,7 @@ contract GateKeeper {
         ISemaphore(_semaphore).createGroup(donatorGroupId, 20, address(this));
     }
 
-    function joinContributorsGroup(
+    function joinContributors(
         uint[2] calldata _pA,
         uint[2][2] calldata _pB,
         uint[2] calldata _pC,

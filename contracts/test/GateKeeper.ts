@@ -43,6 +43,7 @@ describe("GateKeeper", () => {
     gateKeeper = await GateKeeperFactory.deploy(
       semaphore.address,
       prVerifier.address,
+      semaphore.address,
       "0x0000000000000000000000006f614465766974616e2f796c646e656972666b7a",
       "0x0000000000000000000000000000000000000000000000000000000000000000"
     );
@@ -60,27 +61,27 @@ describe("GateKeeper", () => {
 
   it("should be able to join with valid proof", async () => {
     //@ts-ignore
-    await gateKeeper.joinContributorsGroup(...valid_proof_1.calldata);
+    await gateKeeper.joinContributors(...valid_proof_1.calldata);
   });
 
   it("should not be able to use one email more than once", async () => {
     //@ts-ignore
-    await gateKeeper.joinContributorsGroup(...valid_proof_1.calldata);
+    await gateKeeper.joinContributors(...valid_proof_1.calldata);
 
     await expect(
       //@ts-ignore
-      gateKeeper.joinContributorsGroup(...valid_proof_1.calldata)
+      gateKeeper.joinContributors(...valid_proof_1.calldata)
     ).to.be.revertedWithCustomError(gateKeeper, "EmailAlreadyRegistered");
   });
 
   it("should allow multiple users to join", async () => {
     //@ts-ignore
-    await gateKeeper.joinContributorsGroup(...valid_proof_1.calldata);
+    await gateKeeper.joinContributors(...valid_proof_1.calldata);
     //@ts-ignore
-    await gateKeeper.joinContributorsGroup(...valid_proof_2.calldata);
+    await gateKeeper.joinContributors(...valid_proof_2.calldata);
   });
 
   it("should allow users to join by donating", async () => {
-    // await semaphoreContract.join
+    // await semaphoreContract.joinDonationGroup(;
   });
 });
