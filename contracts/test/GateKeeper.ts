@@ -15,6 +15,7 @@ import valid_proof_1 from "./sample_proof/valid_proof_1.json";
 import valid_proof_2 from "./sample_proof/valid_proof_2.json";
 
 import { ethers } from "hardhat";
+import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 
 describe("GateKeeper", () => {
   let gateKeeper: GateKeeper;
@@ -22,7 +23,12 @@ describe("GateKeeper", () => {
   let semaphoreContract: Semaphore;
   const users: Identity[] = [];
 
+  let user1: SignerWithAddress;
+  let user2: SignerWithAddress;
+
   beforeEach(async () => {
+    [user1, user2] = await ethers.getSigners();
+
     const { semaphore } = await run("deploy:semaphore", {
       logs: false,
     });
@@ -72,5 +78,9 @@ describe("GateKeeper", () => {
     await gateKeeper.joinContributorsGroup(...valid_proof_1.calldata);
     //@ts-ignore
     await gateKeeper.joinContributorsGroup(...valid_proof_2.calldata);
+  });
+
+  it("should allow users to join by donating", async () => {
+    // await semaphoreContract.join
   });
 });

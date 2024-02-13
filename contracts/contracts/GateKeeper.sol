@@ -4,22 +4,24 @@ pragma solidity ^0.8.4;
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 import "./interfaces/IPrVerifier.sol";
 
-import "hardhat/console.sol";
-
 // holds repository name packed
 struct Repository {
-    uint _1;
-    uint _2;
+    uint chunk1;
+    uint chunk2;
 }
 
 contract GateKeeper {
     uint256 public immutable CONTRIBUTOR_GROUP_ID;
-    uint256 public immutable INVESTOR_GROUP_ID;
+    uint256 public immutable DONATORS_GROUP_ID;
     address public immutable semaphore;
     address public immutable groth16verifier;
+    address public immutable token;
 
     Repository public repository;
     mapping(uint => bool) public emailNullifier;
+
+    uint public totalContributorsVotingPower;
+    uint public totalDonatorsVotingPower;
 
     error InvalidProof();
     error EmailAlreadyRegistered();
@@ -28,23 +30,25 @@ contract GateKeeper {
     constructor(
         address _semaphore,
         address _groth16verifier,
+        address _token,
         uint _repoNameChunk1,
         uint _repoNameChunk2
     ) {
         semaphore = _semaphore;
         groth16verifier = _groth16verifier;
         repository = Repository(_repoNameChunk1, _repoNameChunk2);
+        token = _token;
 
         // generate random group ids
         uint256 contributorGroupId = uint256(
             keccak256(abi.encodePacked(address(this), "CONTRIBUTOR"))
         );
-        uint256 investorsGroupId = uint256(
-            keccak256(abi.encodePacked(address(this), "INVESTOR"))
+        uint256 donatorGroupId = uint256(
+            keccak256(abi.encodePacked(address(this), "DONATOR"))
         );
 
         CONTRIBUTOR_GROUP_ID = contributorGroupId;
-        INVESTOR_GROUP_ID = investorsGroupId;
+        DONATORS_GROUP_ID = donatorGroupId;
 
         // create groups
         ISemaphore(_semaphore).createGroup(
@@ -52,7 +56,7 @@ contract GateKeeper {
             20,
             address(this)
         );
-        ISemaphore(_semaphore).createGroup(investorsGroupId, 20, address(this));
+        ISemaphore(_semaphore).createGroup(donatorGroupId, 20, address(this));
     }
 
     function joinContributorsGroup(
@@ -72,13 +76,17 @@ contract GateKeeper {
 
         if (emailNullifier[_pubSignals[1]]) revert EmailAlreadyRegistered();
 
-        if (repository._1 != _pubSignals[3] || repository._2 != _pubSignals[4])
-            revert InvalidRepository();
+        if (
+            repository.chunk1 != _pubSignals[3] ||
+            repository.chunk2 != _pubSignals[4]
+        ) revert InvalidRepository();
 
         // todo: verify email sender
 
         emailNullifier[_pubSignals[1]] = true;
         ISemaphore(semaphore).addMember(CONTRIBUTOR_GROUP_ID, _pubSignals[0]);
+
+        totalContributorsVotingPower++;
     }
 
     function sendFeedback(
