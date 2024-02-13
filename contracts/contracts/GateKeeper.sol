@@ -6,26 +6,21 @@ import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 contract GateKeeper {
     uint256 public immutable CONTRIBUTOR_GROUP_ID;
     uint256 public immutable INVESTOR_GROUP_ID;
+    address public immutable semaphore;
 
-    address public semaphore;
-
-    constructor(uint256 _maxDepth) {
-        address _this = address(this);
+    constructor(address _semaphore) {
+        semaphore = _semaphore;
 
         // generate random group ids
-        uint256 contributorGroupId = uint256(
-            keccak256(abi.encodePacked(_this, "CONTRIBUTOR"))
-        );
-        uint256 investorsGroupId = uint256(
-            keccak256(abi.encodePacked(_this, "INVESTOR"))
-        );
+        uint256 contributorGroupId = uint256(keccak256(abi.encodePacked(address(this), "CONTRIBUTOR")));
+        uint256 investorsGroupId = uint256(keccak256(abi.encodePacked(address(this), "INVESTOR")));
 
         CONTRIBUTOR_GROUP_ID = contributorGroupId;
         INVESTOR_GROUP_ID = investorsGroupId;
 
         // create groups
-        ISemaphore(semaphore).createGroup(contributorGroupId, _maxDepth, _this);
-        ISemaphore(semaphore).createGroup(investorsGroupId, _maxDepth, _this);
+        ISemaphore(_semaphore).createGroup(contributorGroupId, 20, address(this));
+        ISemaphore(_semaphore).createGroup(investorsGroupId, 20, address(this));
     }
 
     function sendFeedback(
