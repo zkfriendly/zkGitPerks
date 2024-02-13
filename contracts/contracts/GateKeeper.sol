@@ -10,7 +10,10 @@ contract GateKeeper {
     address public immutable semaphore;
     address public immutable prVerifier;
 
+    mapping(uint => bool) public emailNullifier;
+
     error InvalidProof();
+    error EmailAlreadyRegistered();
 
     constructor(address _semaphore, address _prVerifier) {
         semaphore = _semaphore;
@@ -45,6 +48,9 @@ contract GateKeeper {
         if (!IPrVerifier(prVerifier).verifyProof(_pA, _pB, _pC, _pubSignals))
             revert InvalidProof();
 
+        if (emailNullifier[_pubSignals[1]]) revert EmailAlreadyRegistered();
+
+        emailNullifier[_pubSignals[1]] = true;
         // ISemaphore(semaphore).addMember(CONTRIBUTOR_GROUP_ID, msg.sender);
     }
 

@@ -14,7 +14,6 @@ import {
 import valid_proof from "./sample_proof/valid_proof.json";
 
 import { ethers } from "hardhat";
-import { BigNumber } from "ethers";
 
 describe("GateKeeper", () => {
   let gateKeeper: GateKeeper;
@@ -22,7 +21,7 @@ describe("GateKeeper", () => {
   let semaphoreContract: Semaphore;
   const users: Identity[] = [];
 
-  before(async () => {
+  beforeEach(async () => {
     const { semaphore } = await run("deploy:semaphore", {
       logs: false,
     });
@@ -53,5 +52,15 @@ describe("GateKeeper", () => {
   it("should be able to join with valid proof", async () => {
     //@ts-ignore
     await gateKeeper.joinContributorsGroup(...valid_proof.calldata);
+  });
+
+  it("should not be able to use one email more than once", async () => {
+    //@ts-ignore
+    await gateKeeper.joinContributorsGroup(...valid_proof.calldata);
+
+    await expect(
+      //@ts-ignore
+      gateKeeper.joinContributorsGroup(...valid_proof.calldata)
+    ).to.be.revertedWithCustomError(gateKeeper, "EmailAlreadyRegistered");
   });
 });
