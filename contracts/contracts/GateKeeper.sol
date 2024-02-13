@@ -11,6 +11,13 @@ struct Repository {
     uint chunk2;
 }
 
+struct Proof {
+    uint[2] _pA;
+    uint[2][2] _pB;
+    uint[2] _pC;
+    uint[5] _pubSignals;
+}
+
 contract GateKeeper {
     using SafeERC20 for IERC20;
 
@@ -65,61 +72,40 @@ contract GateKeeper {
         ISemaphore(_semaphore).createGroup(donatorGroupId, 20, address(this));
     }
 
-    function joinContributors(
-        uint[2] calldata _pA,
-        uint[2][2] calldata _pB,
-        uint[2] calldata _pC,
-        uint[5] calldata _pubSignals
-    ) external {
-        if (
-            !IGroth16Verifier(groth16verifier).verifyProof(
-                _pA,
-                _pB,
-                _pC,
-                _pubSignals
-            )
-        ) revert InvalidProof();
-
-        if (emailNullifier[_pubSignals[1]]) revert EmailAlreadyRegistered();
-
-        if (
-            repository.chunk1 != _pubSignals[3] ||
-            repository.chunk2 != _pubSignals[4]
-        ) revert InvalidRepository();
-
-        // todo: verify email sender
-
-        emailNullifier[_pubSignals[1]] = true;
-        ISemaphore(semaphore).addMember(CONTRIBUTOR_GROUP_ID, _pubSignals[0]);
-
+    function joinContributors(Proof calldata proof) external {
+        uint commitment = _validateProof(proof);
         totalContributors++;
+        ISemaphore(semaphore).addMember(CONTRIBUTOR_GROUP_ID, commitment);
+        // todo: verify email sender
     }
 
     function joinDonators(uint commitment) external {
+        totalDonators++;
+        ISemaphore(semaphore).addMember(DONATORS_GROUP_ID, commitment);
         IERC20(token).safeTransferFrom(
             msg.sender,
             address(this),
             donationAmount
         );
-        ISemaphore(semaphore).addMember(DONATORS_GROUP_ID, commitment);
-
-        totalDonators++;
     }
 
-    function sendFeedback(
-        uint256 feedback,
-        uint256 merkleTreeRoot,
-        uint256 nullifierHash,
-        uint256 merkleTreedepth,
-        uint256[8] calldata proof
-    ) external {
-        // SemaphoreProof memory semaphoreProof = SemaphoreProof({
-        //     merkleTreeDepth: merkleTreedepth,
-        //     merkleTreeRoot: merkleTreeRoot,
-        //     nullifier: nullifierHash,
-        //     message: feedback,
-        //     scope: groupId,
-        //     points: proof
-        // });
+    function _validateProof(Proof memory proof) internal returns (uint) {
+        if (
+            !IGroth16Verifier(groth16verifier).verifyProof(
+                proof._pA,
+                proof._pB,
+                proof._pC,
+                proof._pubSignals
+            )
+        ) revert InvalidProof();
+
+        if (emailNullifier[proof._pubSignals[1]])
+            revert EmailAlreadyRegistered();
+
+        if (
+            repository.chunk1 != proof._pubSignals[3] ||
+            repository.chunk2 != proof._pubSignals[4]
+        ) revert InvalidRepository();
+        emailNullifier[proof._pubSignals[1]] = true;
     }
 }

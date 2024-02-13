@@ -71,30 +71,30 @@ describe("GateKeeper", () => {
     it("should be able to join with valid proof", async () => {
       const before = await gateKeeper.totalContributors();
       //@ts-ignore
-      await gateKeeper.joinContributors(...valid_proof_1.calldata);
+      await gateKeeper.joinContributors(valid_proof_1.calldata);
       const after = await gateKeeper.totalContributors();
     });
 
     it("should not be able to use one email more than once", async () => {
       //@ts-ignore
-      await gateKeeper.joinContributors(...valid_proof_1.calldata);
+      await gateKeeper.joinContributors(valid_proof_1.calldata);
 
       await expect(
         //@ts-ignore
-        gateKeeper.joinContributors(...valid_proof_1.calldata)
+        gateKeeper.joinContributors(valid_proof_1.calldata)
       ).to.be.revertedWith("EmailAlreadyRegistered");
     });
 
     it("should allow multiple users to join", async () => {
       let before = await gateKeeper.totalContributors();
       //@ts-ignore
-      await gateKeeper.joinContributors(...valid_proof_1.calldata);
+      await gateKeeper.joinContributors(valid_proof_1.calldata);
       let after = await gateKeeper.totalContributors();
       expect(after).to.equal(before.add(1));
 
       before = after;
       //@ts-ignore
-      await gateKeeper.joinContributors(...valid_proof_2.calldata);
+      await gateKeeper.joinContributors(valid_proof_2.calldata);
       after = await gateKeeper.totalContributors();
       expect(after).to.equal(before.add(1));
     });
