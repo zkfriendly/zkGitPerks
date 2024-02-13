@@ -11,7 +11,8 @@ import {
   Semaphore,
   Groth16Verifier,
 } from "../build/typechain";
-import valid_proof from "./sample_proof/valid_proof.json";
+import valid_proof_1 from "./sample_proof/valid_proof_1.json";
+import valid_proof_2 from "./sample_proof/valid_proof_2.json";
 
 import { ethers } from "hardhat";
 
@@ -36,13 +37,13 @@ describe("GateKeeper", () => {
     gateKeeper = await GateKeeperFactory.deploy(
       semaphore.address,
       prVerifier.address,
-      "0x006c6c6168632d6173722f7968706172676f74707972432d6c616e6964726143",
-      "0x0000000000000000000000000000000000006f6c61682d687469772d65676e65"
+      "0x0000000000000000000000006f614465766974616e2f796c646e656972666b7a",
+      "0x0000000000000000000000000000000000000000000000000000000000000000"
     );
     semaphoreContract = semaphore;
 
-    users.push(new Identity());
-    users.push(new Identity());
+    users.push(new Identity("1"));
+    users.push(new Identity("2"));
   });
 
   it("should have proper gate keeper settings", async () => {
@@ -53,16 +54,23 @@ describe("GateKeeper", () => {
 
   it("should be able to join with valid proof", async () => {
     //@ts-ignore
-    await gateKeeper.joinContributorsGroup(...valid_proof.calldata);
+    await gateKeeper.joinContributorsGroup(...valid_proof_1.calldata);
   });
 
   it("should not be able to use one email more than once", async () => {
     //@ts-ignore
-    await gateKeeper.joinContributorsGroup(...valid_proof.calldata);
+    await gateKeeper.joinContributorsGroup(...valid_proof_1.calldata);
 
     await expect(
       //@ts-ignore
-      gateKeeper.joinContributorsGroup(...valid_proof.calldata)
+      gateKeeper.joinContributorsGroup(...valid_proof_1.calldata)
     ).to.be.revertedWithCustomError(gateKeeper, "EmailAlreadyRegistered");
+  });
+
+  it("should allow multiple users to join", async () => {
+    //@ts-ignore
+    await gateKeeper.joinContributorsGroup(...valid_proof_1.calldata);
+    //@ts-ignore
+    await gateKeeper.joinContributorsGroup(...valid_proof_2.calldata);
   });
 });

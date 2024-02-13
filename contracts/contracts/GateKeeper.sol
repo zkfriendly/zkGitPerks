@@ -4,6 +4,8 @@ pragma solidity ^0.8.4;
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 import "./interfaces/IPrVerifier.sol";
 
+import "hardhat/console.sol";
+
 // holds repository name packed
 struct Repository {
     uint _1;
@@ -73,8 +75,10 @@ contract GateKeeper {
         if (repository._1 != _pubSignals[3] || repository._2 != _pubSignals[4])
             revert InvalidRepository();
 
+        // todo: verify email sender
+
         emailNullifier[_pubSignals[1]] = true;
-        // ISemaphore(semaphore).addMember(CONTRIBUTOR_GROUP_ID, msg.sender);
+        ISemaphore(semaphore).addMember(CONTRIBUTOR_GROUP_ID, _pubSignals[0]);
     }
 
     function sendFeedback(
