@@ -3,5 +3,8 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
     "hardhat": "^2.19.5"
+  },
+  "dependencies": {
+    "@semaphore-protocol/contracts": "^4.0.0-alpha.7"
   }
 }
