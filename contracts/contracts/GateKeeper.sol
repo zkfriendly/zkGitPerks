@@ -75,6 +75,14 @@ contract GateKeeper {
         ISemaphore(_semaphore).createGroup(donatorGroupId, 20, address(this));
     }
 
+    function isContributor(uint commitment) external view returns (bool) {
+        return isMember[CONTRIBUTOR_GROUP_ID][commitment];
+    }
+
+    function isDonator(uint commitment) external view returns (bool) {
+        return isMember[DONATORS_GROUP_ID][commitment];
+    }
+
     function joinContributors(Proof calldata proof) external {
         uint commitment = _validateProof(proof);
         if (isMember[CONTRIBUTOR_GROUP_ID][commitment])
