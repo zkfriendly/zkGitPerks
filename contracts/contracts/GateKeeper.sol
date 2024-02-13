@@ -4,29 +4,9 @@ pragma solidity ^0.8.4;
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
 import "./interfaces/IGroth16Verifier.sol";
 import "./interfaces/IERC20.sol";
+import "./interfaces/IGateKeeper.sol";
 
-// holds repository name packed
-struct Repository {
-    uint chunk1;
-    uint chunk2;
-}
-
-struct Proof {
-    uint[2] _pA;
-    uint[2][2] _pB;
-    uint[2] _pC;
-    uint[5] _pubSignals;
-}
-
-struct Signal {
-    uint256 signal;
-    uint256 scope;
-    uint256 merkleTreeRoot;
-    uint256 nullifierHash;
-    uint256[8] proof;
-}
-
-contract GateKeeper {
+contract GateKeeper is IGateKeeperMeta {
     using SafeERC20 for IERC20;
 
     uint256 public immutable CONTRIBUTORS_GROUP_ID;
@@ -36,18 +16,13 @@ contract GateKeeper {
     address public immutable token;
     uint public immutable donationAmount;
 
-    Repository public repository;
+    RepositoryName public repository;
     mapping(uint => bool) public emailNullifier;
     // group id => commitment => isMember
     mapping(uint => mapping(uint => bool)) public isMember;
 
     uint public totalContributors;
     uint public totalDonators;
-
-    error InvalidProof();
-    error EmailAlreadyRegistered();
-    error InvalidRepository();
-    error CommitmentExists();
 
     constructor(
         address _semaphore,
@@ -59,7 +34,7 @@ contract GateKeeper {
     ) {
         semaphore = _semaphore;
         groth16verifier = _groth16verifier;
-        repository = Repository(_repoNameChunk1, _repoNameChunk2);
+        repository = RepositoryName(_repoNameChunk1, _repoNameChunk2);
         token = _token;
         donationAmount = _donationAmount;
 
@@ -83,6 +58,8 @@ contract GateKeeper {
         ISemaphore(_semaphore).createGroup(donatorGroupId, 20, address(this));
     }
 
+    // ================== VIEW FUNCTIONS ==================
+
     function isContributor(uint commitment) external view returns (bool) {
         return isMember[CONTRIBUTORS_GROUP_ID][commitment];
     }
@@ -90,6 +67,8 @@ contract GateKeeper {
     function isDonator(uint commitment) external view returns (bool) {
         return isMember[DONATORS_GROUP_ID][commitment];
     }
+
+    // ================== MUTATING FUNCTIONS ==================
 
     function joinContributors(Proof calldata proof) external {
         uint commitment = _validateContributionProof(proof); // reverts if invalid
@@ -119,6 +98,8 @@ contract GateKeeper {
     function validateContributorSignal(Signal calldata signal) external {
         _validateSignal(CONTRIBUTORS_GROUP_ID, signal);
     }
+
+    // ================== INTERNAL FUNCTIONS ==================
 
     function _validateSignal(uint256 groupId, Signal memory signal) internal {
         ISemaphore(semaphore).verifyProof(

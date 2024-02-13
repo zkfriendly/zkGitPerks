@@ -161,7 +161,7 @@ describe("GateKeeper", () => {
         ).to.be.revertedWith("InvalidProof");
       });
 
-      it("should not be able to valide a signal more than once", async () => {
+      it("should not be able to validate a signal more than once", async () => {
         const gpId = await gateKeeper.CONTRIBUTORS_GROUP_ID();
         //@ts-ignore
         const gp = new Group(gpId);
