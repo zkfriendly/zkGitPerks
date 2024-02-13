@@ -30,6 +30,8 @@ contract GateKeeper {
 
     Repository public repository;
     mapping(uint => bool) public emailNullifier;
+    // group id => commitment => isMember
+    mapping(uint => mapping(uint => bool)) public isMember;
 
     uint public totalContributors;
     uint public totalDonators;
@@ -37,6 +39,7 @@ contract GateKeeper {
     error InvalidProof();
     error EmailAlreadyRegistered();
     error InvalidRepository();
+    error CommitmentExists();
 
     constructor(
         address _semaphore,
@@ -74,12 +77,16 @@ contract GateKeeper {
 
     function joinContributors(Proof calldata proof) external {
         uint commitment = _validateProof(proof);
+        if (isMember[CONTRIBUTOR_GROUP_ID][commitment])
+            revert CommitmentExists();
+        isMember[CONTRIBUTOR_GROUP_ID][commitment] = true;
         totalContributors++;
         ISemaphore(semaphore).addMember(CONTRIBUTOR_GROUP_ID, commitment);
-        // todo: verify email sender
     }
 
     function joinDonators(uint commitment) external {
+        if (isMember[DONATORS_GROUP_ID][commitment]) revert CommitmentExists();
+        isMember[DONATORS_GROUP_ID][commitment] = true;
         totalDonators++;
         ISemaphore(semaphore).addMember(DONATORS_GROUP_ID, commitment);
         IERC20(token).safeTransferFrom(
@@ -107,5 +114,8 @@ contract GateKeeper {
             repository.chunk2 != proof._pubSignals[4]
         ) revert InvalidRepository();
         emailNullifier[proof._pubSignals[1]] = true;
+        // todo: verify email sender
+
+        return proof._pubSignals[0];
     }
 }
