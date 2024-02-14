@@ -4,7 +4,7 @@ import type { AppProps } from "next/app"
 import getNextConfig from "next/config"
 import Head from "next/head"
 import { useRouter } from "next/router"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { FaGithub } from "react-icons/fa"
 import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
@@ -27,7 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
     }, [])
 
     return (
-        <>
+        <React.StrictMode>
             <Head>
                 <title>Semaphore boilerplate</title>
                 <link rel="icon" href="/favicon.ico" />
@@ -72,6 +72,6 @@ export default function App({ Component, pageProps }: AppProps) {
                     </HStack>
                 </ChakraProvider>
             </Web3ReactProvider>
-        </>
+        </React.StrictMode>
     )
 }

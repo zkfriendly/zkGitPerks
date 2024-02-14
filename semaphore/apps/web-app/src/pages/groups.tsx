@@ -22,8 +22,9 @@ import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
 import IconRefreshLine from "../icons/IconRefreshLine"
 import DragAndDropTextBox from "../components/DragAndDropTextBox"
-
 import IconAddCircleFill from "../icons/IconAddCircleFill"
+import { verifyDKIMSignature } from "@zk-email/helpers/dist/dkim"
+import { generateCircuitInputs } from "@zk-email/helpers/dist/input-helpers"
 
 const fileTypes = ["eml"]
 
@@ -35,7 +36,7 @@ export default function GroupsPage() {
     const { _users, refreshUsers, addUser } = useContext(SemaphoreContext)
     const [_loading, setLoading] = useBoolean()
     const [_identity, setIdentity] = useState<Identity>()
-    const [emailFull, setEmailFull] = useState("")
+    const [emailFull, setEmailFull] = useState<string>("")
 
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
@@ -107,7 +108,69 @@ export default function GroupsPage() {
         }
     }
 
-    const generateEmailProof = useCallback(async () => {}, [])
+    async function getProofInputs(rawEmail: string, owner: string) {
+        const STRING_PRESELECTOR = "Merged #"
+        const TO_SELECTOR = "to:"
+        const MAX_HEADER_PADDED_BYTES = 2048
+        const MAX_BODY_PADDED_BYTES = 3072
+
+        const dkimResult = await verifyDKIMSignature(Buffer.from(rawEmail))
+
+        const emailVerifierInputs = generateCircuitInputs({
+            rsaSignature: dkimResult.signature,
+            rsaPublicKey: dkimResult.publicKey,
+            body: dkimResult.body,
+            bodyHash: dkimResult.bodyHash,
+            message: dkimResult.message,
+            shaPrecomputeSelector: STRING_PRESELECTOR,
+            maxMessageLength: MAX_HEADER_PADDED_BYTES,
+            maxBodyLength: MAX_BODY_PADDED_BYTES
+        })
+
+        const header = emailVerifierInputs.in_padded.map((x) => Number(x))
+        const selectorBuffer = Buffer.from(TO_SELECTOR)
+        const toIndex = Buffer.from(header).indexOf(selectorBuffer) + selectorBuffer.length
+
+        const inputJson = {
+            ...emailVerifierInputs,
+            to_index: toIndex.toString(),
+            owner
+        }
+
+        return inputJson
+    }
+
+    const generateEmailProof = useCallback(async () => {
+        if (!_identity) {
+            return
+        }
+        setLoading.on()
+        const endponit = env.SINDRIA_API_URL
+        const api_key = env.SINDRIA_API_KEY
+        const circuit_id = env.SINDRIA_CIRCUIT_ID
+        const headers = {
+            Accept: "application/json",
+            Authorization: `Bearer ${api_key}`
+        }
+        const data = {
+            proof_input: getProofInputs(emailFull, _identity.commitment.toString()),
+            perform_verify: true
+        }
+
+        fetch(`${endponit}/circuits/${circuit_id}/prove`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify(data)
+        })
+            .then((res) => res.json())
+            .then((res) => {
+                setLogs(`Proof is being generated... 🤖 this could take a few minuts. proof id: ${res.proof_id}`)
+            })
+            .catch((err) => {
+                setLogs(`Error generating proof: ${err}`)
+            })
+        setLoading.off()
+    }, [])
 
     return (
         <>
@@ -146,7 +209,9 @@ export default function GroupsPage() {
                 justifyContent="left"
                 colorScheme="primary"
                 px="4"
-                onClick={generateEmailProof}
+                onClick={async () => {
+                    const dkimResult = await verifyDKIMSignature(emailFull)
+                }}
                 isDisabled={_loading || !_identity || userHasJoined(_identity) || !emailFull}
                 leftIcon={<IconAddCircleFill />}
             >
