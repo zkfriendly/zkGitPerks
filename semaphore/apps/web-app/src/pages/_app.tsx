@@ -10,6 +10,9 @@ import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
 import useSemaphore from "../hooks/useSemaphore"
 import theme from "../styles/index"
+import { providers } from "ethers"
+import { Web3ReactProvider } from "@web3-react/core"
+import ConnectWallet from "../components/ConnectWallet"
 
 const { publicRuntimeConfig: env } = getNextConfig()
 
@@ -23,22 +26,6 @@ export default function App({ Component, pageProps }: AppProps) {
         semaphore.refreshFeedback()
     }, [])
 
-    function shortenAddress(address: string) {
-        return `${address.slice(0, 6)}...${address.slice(-4)}`
-    }
-
-    function getExplorerLink(network: SupportedNetwork, address: string) {
-        switch (network) {
-            case "goerli":
-            case "sepolia":
-                return `https://${network}.etherscan.io/address/${address}`
-            case "arbitrum-goerli":
-                return `https://goerli.arbiscan.io/address/${address}`
-            default:
-                return ""
-        }
-    }
-
     return (
         <>
             <Head>
@@ -50,45 +37,41 @@ export default function App({ Component, pageProps }: AppProps) {
                 <link rel="manifest" href="/manifest.json" />
                 <meta name="theme-color" content="#ebedff" />
             </Head>
+            <Web3ReactProvider getLibrary={(provider) => new providers.Web3Provider(provider)}>
+                <ChakraProvider theme={theme}>
+                    <HStack align="center" justify="right" p="2">
+                        <ConnectWallet />
+                    </HStack>
 
-            <ChakraProvider theme={theme}>
-                <HStack align="center" justify="right" p="2">
-                    <Link href={getExplorerLink(env.DEFAULT_NETWORK, env.FEEDBACK_CONTRACT_ADDRESS)} isExternal>
-                        <Text>{shortenAddress(env.FEEDBACK_CONTRACT_ADDRESS)}</Text>
-                    </Link>
-                    <Link href="https://github.com/semaphore-protocol/boilerplate" isExternal>
-                        <IconButton aria-label="Github repository" icon={<Icon boxSize={6} as={FaGithub} />} />
-                    </Link>
-                </HStack>
+                    <Container maxW="lg" flex="1" display="flex" alignItems="center">
+                        <Stack py="8" display="flex" width="100%">
+                            <SemaphoreContext.Provider value={semaphore}>
+                                <LogsContext.Provider
+                                    value={{
+                                        _logs,
+                                        setLogs
+                                    }}
+                                >
+                                    <Component {...pageProps} />
+                                </LogsContext.Provider>
+                            </SemaphoreContext.Provider>
+                        </Stack>
+                    </Container>
 
-                <Container maxW="lg" flex="1" display="flex" alignItems="center">
-                    <Stack py="8" display="flex" width="100%">
-                        <SemaphoreContext.Provider value={semaphore}>
-                            <LogsContext.Provider
-                                value={{
-                                    _logs,
-                                    setLogs
-                                }}
-                            >
-                                <Component {...pageProps} />
-                            </LogsContext.Provider>
-                        </SemaphoreContext.Provider>
-                    </Stack>
-                </Container>
-
-                <HStack
-                    flexBasis="56px"
-                    borderTop="1px solid #8f9097"
-                    backgroundColor="#DAE0FF"
-                    align="center"
-                    justify="center"
-                    spacing="4"
-                    p="4"
-                >
-                    {_logs.endsWith("...") && <Spinner color="primary.400" />}
-                    <Text fontWeight="bold">{_logs || `Current step: ${router.route}`}</Text>
-                </HStack>
-            </ChakraProvider>
+                    <HStack
+                        flexBasis="56px"
+                        borderTop="1px solid #8f9097"
+                        backgroundColor="#DAE0FF"
+                        align="center"
+                        justify="center"
+                        spacing="4"
+                        p="4"
+                    >
+                        {_logs.endsWith("...") && <Spinner color="primary.400" />}
+                        <Text fontWeight="bold">{_logs || `Current step: ${router.route}`}</Text>
+                    </HStack>
+                </ChakraProvider>
+            </Web3ReactProvider>
         </>
     )
 }
