@@ -54,15 +54,14 @@ export async function generatePrMergedIntoMainCircuitInputs(
 
 (async function generateInputs() {
   const rawEmail = fs.readFileSync(
-    path.join(__dirname, "../emls/pr.eml"),
+    path.join(__dirname, "../emls/pr_2.eml"),
     "utf8"
   );
-  const address = bytesToBigInt(
-    fromHex("0x743844f742168e0ace16E747745686bCC247146B")
-  ).toString();
+  const owner =
+    "13255821893820536903335282929376140649646180444238593676033702344407594536519";
   const inputJson = await generatePrMergedIntoMainCircuitInputs(
     rawEmail,
-    address
+    owner
   );
 
   // input json path in artifacts

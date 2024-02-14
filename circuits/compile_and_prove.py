@@ -46,7 +46,7 @@ def deploy_circuit():
     return response.json().get("circuit_id")  # Obtain circuit_id
 
 def main():
-    circuit_id = deploy_circuit()
+    circuit_id = "1b55da13-77d8-4913-944f-d8f6f07d13d9"
 
     # Poll circuit detail unitl it has a status of Ready or Failed
     TIMEOUT = 600  # timeout after 10 minutes
