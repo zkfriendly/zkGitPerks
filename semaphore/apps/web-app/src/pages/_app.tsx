@@ -18,7 +18,7 @@ const { publicRuntimeConfig: env } = getNextConfig()
 
 export default function App({ Component, pageProps }: AppProps) {
     const router = useRouter()
-    const semaphore = useSemaphore()
+    const semaphore = useSemaphore({ groupId: env.GROUP_ID })
     const [_logs, setLogs] = useState<string>("")
 
     useEffect(() => {

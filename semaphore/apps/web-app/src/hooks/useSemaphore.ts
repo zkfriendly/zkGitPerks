@@ -8,7 +8,7 @@ const { publicRuntimeConfig: env } = getNextConfig()
 
 const ethereumNetwork = env.DEFAULT_NETWORK === "localhost" ? "http://localhost:8545" : env.DEFAULT_NETWORK
 
-export default function useSemaphore(): SemaphoreContextType {
+export default function useSemaphore({ groupId }: { groupId: string }): SemaphoreContextType {
     const [_users, setUsers] = useState<any[]>([])
     const [_feedback, setFeedback] = useState<string[]>([])
 
@@ -17,7 +17,7 @@ export default function useSemaphore(): SemaphoreContextType {
             address: env.SEMAPHORE_CONTRACT_ADDRESS
         })
 
-        const members = await semaphore.getGroupMembers(env.GROUP_ID)
+        const members = await semaphore.getGroupMembers(groupId)
 
         setUsers(members)
     }, [])
@@ -34,7 +34,7 @@ export default function useSemaphore(): SemaphoreContextType {
             address: env.SEMAPHORE_CONTRACT_ADDRESS
         })
 
-        const proofs = await semaphore.getGroupVerifiedProofs(env.GROUP_ID)
+        const proofs = await semaphore.getGroupVerifiedProofs(groupId)
 
         setFeedback(proofs.map(({ signal }: any) => utils.parseBytes32String(BigNumber.from(signal).toHexString())))
     }, [])

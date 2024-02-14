@@ -1,4 +1,16 @@
-import { Box, Button, Divider, Heading, HStack, Link, Text, useBoolean, VStack } from "@chakra-ui/react"
+import {
+    Box,
+    Button,
+    Divider,
+    Heading,
+    Highlight,
+    HStack,
+    Link,
+    Stack,
+    Text,
+    useBoolean,
+    VStack
+} from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
 import getNextConfig from "next/config"
 import { useRouter } from "next/router"
@@ -83,17 +95,22 @@ export default function GroupsPage() {
     return (
         <>
             <Heading as="h2" size="xl">
-                Groups
+                Contributors Club 💻
             </Heading>
 
-            <Text pt="2" fontSize="md">
-                Semaphore{" "}
-                <Link href="https://semaphore.pse.dev/docs/guides/groups" color="primary.500" isExternal>
-                    groups
-                </Link>{" "}
-                are binary incremental Merkle trees in which each leaf contains an identity commitment for a user.
-                Groups can be abstracted to represent events, polls, or organizations.
-            </Text>
+            <Stack spacing={2}>
+                <Text color="green.900">
+                    Join the contributors club to enjoy all the available perks and benefits. You can{" "}
+                    <Highlight query={["ananymously"]} styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}>
+                        ananymously
+                    </Highlight>
+                    claim reimbursments on event tickets, travel expenses, and much more. 💰
+                </Text>
+                <Text color="blue.500">
+                    But first you need to prove your a contributor. upload an email you rceived that shows your PR was
+                    merged into main. 📧
+                </Text>
+            </Stack>
 
             <Divider pt="5" borderColor="gray.500" />
 

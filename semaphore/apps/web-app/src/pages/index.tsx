@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Heading, HStack, Link, ListItem, OrderedList, Text } from "@chakra-ui/react"
+import { Box, Button, Divider, Heading, HStack, Link, ListItem, OrderedList, Stack, Text } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
 import { useRouter } from "next/router"
 import { useCallback, useContext, useEffect, useState } from "react"
@@ -16,7 +16,7 @@ export default function IdentitiesPage() {
     const router = useRouter()
     const { setLogs } = useContext(LogsContext)
     const [_identity, setIdentity] = useState<Identity>()
-    const { activate, active, library, account } = useWeb3React<providers.Web3Provider>()
+    const { active, library, account } = useWeb3React<providers.Web3Provider>()
 
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
@@ -51,7 +51,7 @@ export default function IdentitiesPage() {
     return (
         <>
             <Heading as="h2" size="xl">
-                Identities
+                Welcom to Git Perks! 🎉
             </Heading>
 
             <Text pt="2" fontSize="md">
@@ -69,16 +69,14 @@ export default function IdentitiesPage() {
 
             <Divider pt="5" borderColor="gray.500" />
 
-            <HStack pt="5" justify="space-between">
+            <Stack pt="5" justify="space-between">
                 <Text fontWeight="bold" fontSize="lg">
-                    Identity
+                    Identity Generated Based on Your Wallet
                 </Text>
-                {_identity && (
-                    <Button leftIcon={<IconRefreshLine />} variant="link" color="text.700" onClick={createIdentity}>
-                        New
-                    </Button>
-                )}
-            </HStack>
+                <Text fontSize="sm" color="green.900">
+                    You don't need to write down or remember your identity. It's stored in your wallet.
+                </Text>
+            </Stack>
 
             {_identity ? (
                 <Box py="6" whiteSpace="nowrap">
