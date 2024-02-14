@@ -209,9 +209,7 @@ export default function GroupsPage() {
                 justifyContent="left"
                 colorScheme="primary"
                 px="4"
-                onClick={async () => {
-                    const dkimResult = await verifyDKIMSignature(emailFull)
-                }}
+                onClick={generateEmailProof}
                 isDisabled={_loading || !_identity || userHasJoined(_identity) || !emailFull}
                 leftIcon={<IconAddCircleFill />}
             >
