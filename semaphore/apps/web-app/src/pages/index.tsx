@@ -6,11 +6,17 @@ import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
 import IconRefreshLine from "../icons/IconRefreshLine"
+import { providers } from "ethers"
+import { useWeb3React } from "@web3-react/core"
+import { InjectedConnector } from "@web3-react/injected-connector"
+
+const injectedConnector = new InjectedConnector({})
 
 export default function IdentitiesPage() {
     const router = useRouter()
     const { setLogs } = useContext(LogsContext)
     const [_identity, setIdentity] = useState<Identity>()
+    const { activate, active, library, account } = useWeb3React<providers.Web3Provider>()
 
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
@@ -27,14 +33,20 @@ export default function IdentitiesPage() {
     }, [])
 
     const createIdentity = useCallback(async () => {
-        const identity = new Identity()
+        if (active) {
+            const signer = library!.getSigner(account!)
+            const message = `Sign this message to generate your Semaphore identity.`
+            const identity = new Identity(await signer.signMessage(message))
 
-        setIdentity(identity)
+            setIdentity(identity)
 
-        localStorage.setItem("identity", identity.toString())
+            localStorage.setItem("identity", identity.toString())
 
-        setLogs("Your new Semaphore identity was just created 🎉")
-    }, [])
+            setLogs("Your new Semaphore identity was just created 🎉")
+        } else {
+            setLogs("Connect your wallet to create a Semaphore identity 👆🏽")
+        }
+    }, [active])
 
     return (
         <>
@@ -90,10 +102,11 @@ export default function IdentitiesPage() {
                         justifyContent="left"
                         colorScheme="primary"
                         px="4"
+                        disabled={!active}
                         onClick={createIdentity}
                         leftIcon={<IconAddCircleFill />}
                     >
-                        Create identity
+                        {active ? "Create identity" : "Connect Metamask"}
                     </Button>
                 </Box>
             )}
