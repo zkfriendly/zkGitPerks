@@ -8,6 +8,7 @@ import {
     Link,
     Stack,
     Text,
+    Textarea,
     useBoolean,
     VStack
 } from "@chakra-ui/react"
@@ -19,8 +20,12 @@ import Feedback from "../../contract-artifacts/Feedback.json"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
-import IconAddCircleFill from "../icons/IconAddCircleFill"
 import IconRefreshLine from "../icons/IconRefreshLine"
+import DragAndDropTextBox from "../components/DragAndDropTextBox"
+
+import IconAddCircleFill from "../icons/IconAddCircleFill"
+
+const fileTypes = ["eml"]
 
 const { publicRuntimeConfig: env } = getNextConfig()
 
@@ -30,6 +35,7 @@ export default function GroupsPage() {
     const { _users, refreshUsers, addUser } = useContext(SemaphoreContext)
     const [_loading, setLoading] = useBoolean()
     const [_identity, setIdentity] = useState<Identity>()
+    const [emailFull, setEmailFull] = useState("")
 
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
@@ -92,12 +98,22 @@ export default function GroupsPage() {
 
     const userHasJoined = useCallback((identity: Identity) => _users.includes(identity.commitment.toString()), [_users])
 
+    const onFileDrop = async (file: File) => {
+        if (file.name.endsWith(".eml")) {
+            const content = await file.text()
+            setEmailFull(content)
+        } else {
+            alert("Only .eml files are allowed.")
+        }
+    }
+
+    const generateEmailProof = useCallback(async () => {}, [])
+
     return (
         <>
             <Heading as="h2" size="xl">
                 Contributors Club 💻
             </Heading>
-
             <Stack spacing={2}>
                 <Text color="green.900">
                     Join the contributors club to enjoy all the available perks and benefits. You can{" "}
@@ -111,33 +127,31 @@ export default function GroupsPage() {
                     merged into main. 📧
                 </Text>
             </Stack>
-
             <Divider pt="5" borderColor="gray.500" />
-
             <HStack py="5" justify="space-between">
                 <Text fontWeight="bold" fontSize="lg">
-                    Feedback users ({_users.length})
+                    Total Contributors ({_users.length})
                 </Text>
                 <Button leftIcon={<IconRefreshLine />} variant="link" color="text.700" onClick={refreshUsers}>
                     Refresh
                 </Button>
             </HStack>
+            <DragAndDropTextBox onFileDrop={onFileDrop} />
+            <Text>or copy paste full PR email with headers</Text>
+            <Textarea value={emailFull} onChange={(e) => setEmailFull(e.target.value)}></Textarea>
 
-            <Box pb="5">
-                <Button
-                    w="100%"
-                    fontWeight="bold"
-                    justifyContent="left"
-                    colorScheme="primary"
-                    px="4"
-                    onClick={joinGroup}
-                    isDisabled={_loading || !_identity || userHasJoined(_identity)}
-                    leftIcon={<IconAddCircleFill />}
-                >
-                    Join group
-                </Button>
-            </Box>
-
+            <Button
+                w="100%"
+                fontWeight="bold"
+                justifyContent="left"
+                colorScheme="primary"
+                px="4"
+                onClick={generateEmailProof}
+                isDisabled={_loading || !_identity || userHasJoined(_identity) || !emailFull}
+                leftIcon={<IconAddCircleFill />}
+            >
+                Generate zk proof
+            </Button>
             {_users.length > 0 && (
                 <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
                     {_users.map((user, i) => (
@@ -149,9 +163,7 @@ export default function GroupsPage() {
                     ))}
                 </VStack>
             )}
-
             <Divider pt="6" borderColor="gray" />
-
             <Stepper
                 step={2}
                 onPrevClick={() => router.push("/")}
