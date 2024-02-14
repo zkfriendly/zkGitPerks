@@ -5,7 +5,7 @@ include "./tum_ticket_regex.circom";
 include "circomlib/circuits/poseidon.circom";
 
 
-template TUMConfVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, max_repo_name_len) {
+template TUMConfVerifier(max_header_bytes, n, k, pack_size, max_repo_name_len) {
     signal input in_padded[max_header_bytes];
     signal input pubkey[k];
     signal input signature[k];
@@ -29,11 +29,10 @@ template TUMConfVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, max_
     
     // pubkey_hash <== EV.pubkey_hash;    
 
-    // verify pr merged into main branch
-    component PR = TUMConfRegex(max_body_bytes);
-    PR.msg <== in_body_padded;
-    log(PR.out);
-    PR.out === 1;
+    component R = TUMConfRegex(max_header_bytes);
+    R.msg <== in_padded;
+    log(R.out);
+    R.out === 1;
 
     // expose signature hash
    var k2_chunked_size = k >> 1;
@@ -53,4 +52,4 @@ template TUMConfVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, max_
     owner_out <== owner;
 }
 
-component main = PrVerifier(2048, 3072, 121, 17, 31, 50);
+component main = TUMConfVerifier(2048, 121, 17, 31, 50);
