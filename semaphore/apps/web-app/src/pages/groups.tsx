@@ -60,6 +60,7 @@ export default function GroupsPage() {
 
         // @ts-ignore
         if (import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK) {
+            // @ts-ignore
             response = await fetch(import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -103,70 +104,9 @@ export default function GroupsPage() {
         }
     }
 
-    async function getProofInputs(rawEmail: string, owner: string) {
-        const STRING_PRESELECTOR = "Merged #"
-        const TO_SELECTOR = "to:"
-        const MAX_HEADER_PADDED_BYTES = 2048
-        const MAX_BODY_PADDED_BYTES = 3072
-
-        const dkimResult = await verifyDKIMSignature(Buffer.from(rawEmail))
-
-        const emailVerifierInputs = generateCircuitInputs({
-            rsaSignature: dkimResult.signature,
-            rsaPublicKey: dkimResult.publicKey,
-            body: dkimResult.body,
-            bodyHash: dkimResult.bodyHash,
-            message: dkimResult.message,
-            shaPrecomputeSelector: STRING_PRESELECTOR,
-            maxMessageLength: MAX_HEADER_PADDED_BYTES,
-            maxBodyLength: MAX_BODY_PADDED_BYTES
-        })
-
-        const header = emailVerifierInputs.in_padded.map((x) => Number(x))
-        const selectorBuffer = Buffer.from(TO_SELECTOR)
-        const toIndex = Buffer.from(header).indexOf(selectorBuffer) + selectorBuffer.length
-
-        const inputJson = {
-            ...emailVerifierInputs,
-            to_index: toIndex.toString(),
-            owner
-        }
-
-        return inputJson
-    }
-
     const generateEmailProof = useCallback(async () => {
-        if (!_identity) {
-            return
-        }
         setLoading.on()
-        // @ts-ignore
-        const endponit = import.meta.env.VITE_SINDRIA_API_URL
-        // @ts-ignore
-        const api_key = import.meta.env.VITE_SINDRIA_API_KEY
-        // @ts-ignore
-        const circuit_id = import.meta.env.VITE_SINDRIA_CIRCUIT_ID
-        const headers = {
-            Accept: "application/json",
-            Authorization: `Bearer ${api_key}`
-        }
-        const data = {
-            proof_input: getProofInputs(emailFull, _identity.commitment.toString()),
-            perform_verify: true
-        }
 
-        fetch(`${endponit}/circuits/${circuit_id}/prove`, {
-            method: "POST",
-            headers,
-            body: JSON.stringify(data)
-        })
-            .then((res) => res.json())
-            .then((res) => {
-                setLogs(`Proof is being generated... 🤖 this could take a few minuts. proof id: ${res.proof_id}`)
-            })
-            .catch((err) => {
-                setLogs(`Error generating proof: ${err}`)
-            })
         setLoading.off()
     }, [])
 
