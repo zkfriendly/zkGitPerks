@@ -1,0 +1,268 @@
+[
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_semaphore",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_verifier",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_repoNameChunk1",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_repoNameChunk2",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "nonpayable",
+        "type": "constructor"
+    },
+    {
+        "inputs": [],
+        "name": "CommitmentExists",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "EmailAlreadyRegistered",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidProof",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidRepository",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "CONTRIBUTORS_GROUP_ID",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "emailNullifier",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "groth16verifier",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "commitment",
+                "type": "uint256"
+            }
+        ],
+        "name": "isContributor",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "isMember",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256[2]",
+                        "name": "_pA",
+                        "type": "uint256[2]"
+                    },
+                    {
+                        "internalType": "uint256[2][2]",
+                        "name": "_pB",
+                        "type": "uint256[2][2]"
+                    },
+                    {
+                        "internalType": "uint256[2]",
+                        "name": "_pC",
+                        "type": "uint256[2]"
+                    },
+                    {
+                        "internalType": "uint256[5]",
+                        "name": "_pubSignals",
+                        "type": "uint256[5]"
+                    }
+                ],
+                "internalType": "struct IGateKeeperMeta.Proof",
+                "name": "proof",
+                "type": "tuple"
+            }
+        ],
+        "name": "joinContributors",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "repository",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "chunk1",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "chunk2",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "semaphore",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "totalContributors",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "totalDonators",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "uint256",
+                        "name": "signal",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "scope",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "merkleTreeRoot",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "nullifierHash",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256[8]",
+                        "name": "proof",
+                        "type": "uint256[8]"
+                    }
+                ],
+                "internalType": "struct IGateKeeperMeta.Signal",
+                "name": "signal",
+                "type": "tuple"
+            }
+        ],
+        "name": "validateContributorSignal",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]

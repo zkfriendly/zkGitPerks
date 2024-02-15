@@ -9,6 +9,7 @@
     "scripts": {
         "dev": "yarn workspaces foreach -pi run dev",
         "dev:web-app": "yarn workspace web-app dev",
+        "postinstall": "yarn workspace web-app postinstall",
         "dev:contracts": "yarn workspace contracts dev",
         "lint": "eslint . --ext .js,.ts",
         "prettier": "prettier -c .",

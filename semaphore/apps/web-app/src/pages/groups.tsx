@@ -60,6 +60,7 @@ export default function GroupsPage() {
 
         // @ts-ignore
         if (import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK) {
+            // @ts-ignore
             response = await fetch(import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

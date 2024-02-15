@@ -7,7 +7,8 @@ const ethereumNetwork =
     // @ts-ignore
     import.meta.env.VITE_DEFAULT_NETWORK === "localhost"
         ? "http://localhost:8545"
-        : import.meta.env.VITE_DEFAULT_NETWORK
+        : // @ts-ignore
+          import.meta.env.VITE_DEFAULT_NETWORK
 
 export default function useSemaphore({ groupId }: { groupId: string }): SemaphoreContextType {
     const [_users, setUsers] = useState<any[]>([])

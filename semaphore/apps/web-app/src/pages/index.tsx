@@ -1,9 +1,8 @@
 import { Box, Button, Divider, Heading, Link, ListItem, OrderedList, Stack, Text } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
 import { useCallback, useContext, useEffect, useState } from "react"
-import { providers } from "ethers"
-import { useWeb3React } from "@web3-react/core"
 import { useNavigate } from "react-router-dom"
+import { useAccount, useSignMessage } from "wagmi"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
@@ -12,7 +11,8 @@ export default function IdentitiesPage() {
     const navigate = useNavigate()
     const { setLogs } = useContext(LogsContext)
     const [_identity, setIdentity] = useState<Identity>()
-    const { active, library, account } = useWeb3React<providers.Web3Provider>()
+    const { isConnected: active } = useAccount()
+    const { signMessageAsync } = useSignMessage()
 
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
@@ -30,9 +30,8 @@ export default function IdentitiesPage() {
 
     const createIdentity = useCallback(async () => {
         if (active) {
-            const signer = library!.getSigner(account!)
             const message = `Sign this message to generate your Semaphore identity.`
-            const identity = new Identity(await signer.signMessage(message))
+            const identity = new Identity(await signMessageAsync({ message }))
 
             setIdentity(identity)
 
