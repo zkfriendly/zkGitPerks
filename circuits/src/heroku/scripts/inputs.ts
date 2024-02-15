@@ -1,20 +1,21 @@
-import { bytesToBigInt, fromHex } from "@zk-email/helpers";
 import { generateCircuitInputs } from "@zk-email/helpers";
 import { verifyDKIMSignature } from "@zk-email/helpers/dist/dkim";
 import fs from "fs";
 import path from "path";
 
-const artifacts_dir = path.join(__dirname, "../../../artifacts/pr");
+const artifacts_dir = path.join(__dirname, "../../../artifacts/heroku");
 
 if (!fs.existsSync(artifacts_dir)) {
   fs.mkdirSync(artifacts_dir, { recursive: true });
 }
 
 export async function getInputs(rawEmail: string, owner: string) {
-  const STRING_PRESELECTOR = "TOTAL CHARGE:";
-  const TO_SELECTOR = "TOTAL CHARGE:";
+  const STRING_PRESELECTOR = "TOTAL CHARGE: $ ";
+  const TOTAL_CHARGE_SELECTOR = "TOTAL CHARGE: $ ";
   const MAX_HEADER_PADDED_BYTES = 2048;
-  const MAX_BODY_PADDED_BYTES = 3072;
+  const MAX_BODY_PADDED_BYTES = 13 * 1024;
+
+  console.log("Verifying DKIM signature...");
 
   const dkimResult = await verifyDKIMSignature(Buffer.from(rawEmail));
 
@@ -29,10 +30,10 @@ export async function getInputs(rawEmail: string, owner: string) {
     maxBodyLength: MAX_BODY_PADDED_BYTES,
   });
 
-  const header = emailVerifierInputs.in_padded.map((x) => Number(x));
-  const selectorBuffer = Buffer.from(TO_SELECTOR);
+  const body = emailVerifierInputs.in_body_padded!.map((x) => Number(x));
+  const selectorBuffer = Buffer.from(TOTAL_CHARGE_SELECTOR);
   const toIndex =
-    Buffer.from(header).indexOf(selectorBuffer) + selectorBuffer.length;
+    Buffer.from(body).indexOf(selectorBuffer) + selectorBuffer.length;
 
   const inputJson = {
     ...emailVerifierInputs,
@@ -40,12 +41,14 @@ export async function getInputs(rawEmail: string, owner: string) {
     owner,
   };
 
+  console.log("Inputs generated successfully!");
+
   return inputJson;
 }
 
 (async function generateInputs() {
   const rawEmail = fs.readFileSync(
-    path.join(__dirname, "../../../emls/pr_2.eml"),
+    path.join(__dirname, "../../../emls/heroku.eml"),
     "utf8"
   );
   const owner =

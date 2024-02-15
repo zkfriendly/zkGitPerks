@@ -1,12 +1,11 @@
 pragma circom 2.1.5;
 
 include "@zk-email/circuits/email-verifier.circom";
-include "./pr_merged_regex.circom";
-include "./subject_repo_regex.circom";
+include "./total_charge_regex.circom";
 include "circomlib/circuits/poseidon.circom";
 
 
-template HerokuBillVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, max_repo_name_len) {
+template HerokuBillVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, max_total_charged_len) {
     signal input in_padded[max_header_bytes];
     signal input pubkey[k];
     signal input signature[k];
@@ -20,9 +19,9 @@ template HerokuBillVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, m
     
     signal output owner_out; // to prevent proof front-running
     signal output sig_hash; // to prevent double spending of the same email
-    signal output pubkey_hash; // to verify github domain
-    var max_repo_name_packed = count_packed(max_repo_name_len, pack_size);
-    signal output repo_name[max_repo_name_packed]; 
+    signal output pubkey_hash; // to verify domain
+    var total_charged_packed = count_packed(max_total_charged_len, pack_size);
+    signal output total_charged[total_charged_packed]; 
     
     // component EV = EmailVerifier(max_header_bytes, max_body_bytes, n, k, 0);
     // EV.in_padded <== in_padded;
@@ -36,18 +35,13 @@ template HerokuBillVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, m
     
     // pubkey_hash <== EV.pubkey_hash;    
 
-    // expose repo name
-    signal (repo_name_out, repo_name_reveal[max_header_bytes]) <== SubjectRepoRegex(max_header_bytes)(in_padded);
-    log(repo_name_out);
-    repo_name_out === 1;
-    repo_name <== ShiftAndPackMaskedStr(max_header_bytes, max_repo_name_len, pack_size)(repo_name_reveal, to_index);
+   // expose repo name
+    signal (regex_out, total_charged_reveal[max_body_bytes]) <== TotalChargeRegex(max_body_bytes)(in_body_padded);
+    log(regex_out);
+    regex_out === 1;
+    total_charged <== ShiftAndPackMaskedStr(max_body_bytes, max_total_charged_len, pack_size)(total_charged_reveal, to_index);
 
-    // verify pr merged into main branch
-    component PR = PrMergedRegex(max_body_bytes);
-    PR.msg <== in_body_padded;
-    log(PR.out);
-    PR.out === 1;
-
+   
     // expose signature hash
    var k2_chunked_size = k >> 1;
     if(k % 2 == 1) {
@@ -66,4 +60,4 @@ template HerokuBillVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, m
     owner_out <== owner;
 }
 
-component main = PrVerifier(2048, 3072, 121, 17, 31, 50);
+component main = HerokuBillVerifier(2048, 13312, 121, 17, 31, 10);

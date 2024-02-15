@@ -66,7 +66,7 @@ def main():
         time.sleep(1)
     else:
         sys.exit("Circuit compile polling timed out")
-
+HerokuBillVerifier
     # Check for compilation issues
     if status == "Failed":
         sys.exit("Circuit compilation failed")
