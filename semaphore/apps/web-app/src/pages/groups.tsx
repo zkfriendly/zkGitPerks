@@ -8,6 +8,7 @@ import SemaphoreContext from "../context/SemaphoreContext"
 import IconRefreshLine from "../icons/IconRefreshLine"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
 import { ZkEmail } from "../components/ZkEmail"
+import { getPrProofInputs } from "../lib/input"
 
 export default function GroupsPage() {
     const navigate = useNavigate()
@@ -63,7 +64,7 @@ export default function GroupsPage() {
                     Refresh
                 </Button>
             </HStack>
-            <ZkEmail identity={_identity} />
+            <ZkEmail getProofInputs={getPrProofInputs} identity={_identity!} />
             {_users.length > 0 && (
                 <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
                     {_users.map((user, i) => (

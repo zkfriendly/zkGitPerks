@@ -5,12 +5,20 @@ import IconAddCircleFill from "../icons/IconAddCircleFill"
 import { Identity } from "@semaphore-protocol/identity"
 
 type ZkEmailProps = {
-    identity: Identity | undefined
+    identity: Identity
+    getProofInputs: (emailFull: string, owner: string) => any
 }
 
-export function ZkEmail({ identity }: ZkEmailProps) {
+export function ZkEmail({ identity, getProofInputs }: ZkEmailProps) {
     const [emailFull, setEmailFull] = useState<string>("")
     const [loading, setLoading] = useState(false)
+
+    const generateProof = async () => {
+        setLoading(true)
+        const proofInputs = await getProofInputs(emailFull, identity!.commitment.toString())
+        console.log(proofInputs)
+        setLoading(false)
+    }
 
     const onFileDrop = async (file: File) => {
         if (file.name.endsWith(".eml")) {
@@ -32,7 +40,7 @@ export function ZkEmail({ identity }: ZkEmailProps) {
                 justifyContent="left"
                 colorScheme="primary"
                 px="4"
-                onClick={() => {}}
+                onClick={generateProof}
                 isDisabled={loading || !identity || !emailFull}
                 leftIcon={<IconAddCircleFill />}
             >
