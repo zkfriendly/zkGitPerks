@@ -1,19 +1,15 @@
-import { Box, Button, Divider, Heading, HStack, Link, ListItem, OrderedList, Stack, Text } from "@chakra-ui/react"
+import { Box, Button, Divider, Heading, Link, ListItem, OrderedList, Stack, Text } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
-import { useRouter } from "next/router"
 import { useCallback, useContext, useEffect, useState } from "react"
+import { providers } from "ethers"
+import { useWeb3React } from "@web3-react/core"
+import { useNavigate } from "react-router-dom"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
-import IconRefreshLine from "../icons/IconRefreshLine"
-import { providers } from "ethers"
-import { useWeb3React } from "@web3-react/core"
-import { InjectedConnector } from "@web3-react/injected-connector"
-
-const injectedConnector = new InjectedConnector({})
 
 export default function IdentitiesPage() {
-    const router = useRouter()
+    const navigate = useNavigate()
     const { setLogs } = useContext(LogsContext)
     const [_identity, setIdentity] = useState<Identity>()
     const { active, library, account } = useWeb3React<providers.Web3Provider>()
@@ -111,7 +107,7 @@ export default function IdentitiesPage() {
 
             <Divider pt="3" borderColor="gray" />
 
-            <Stepper step={1} onNextClick={_identity && (() => router.push("/groups"))} />
+            <Stepper step={1} onNextClick={_identity && (() => navigate("/groups"))} />
         </>
     )
 }

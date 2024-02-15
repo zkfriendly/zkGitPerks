@@ -4,7 +4,7 @@ import { InjectedConnector } from "@web3-react/injected-connector"
 import { providers } from "ethers"
 import { Button, HStack, Text } from "@chakra-ui/react"
 import { SupportedNetwork } from "@semaphore-protocol/data"
-import Link from "next/link"
+import { Link } from "react-router-dom"
 
 const injectedConnector = new InjectedConnector({})
 
@@ -46,7 +46,7 @@ export default function ConnectWallet() {
                 </Button>
             ) : (
                 <HStack align="center" justify="right" p="2">
-                    <Link href={getExplorerLink(SupportedNetwork.SEPOLIA, account!)}>
+                    <Link to={getExplorerLink(SupportedNetwork.SEPOLIA, account!)}>
                         <Text fontSize="sm" color="gray.500" cursor="pointer">
                             {shortenAddress(account!)}
                         </Text>

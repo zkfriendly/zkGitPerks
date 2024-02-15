@@ -1,11 +1,9 @@
 import {
-    Box,
     Button,
     Divider,
     Heading,
     Highlight,
     HStack,
-    Link,
     Stack,
     Text,
     Textarea,
@@ -13,9 +11,10 @@ import {
     VStack
 } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
-import getNextConfig from "next/config"
-import { useRouter } from "next/router"
 import { useCallback, useContext, useEffect, useState } from "react"
+import { verifyDKIMSignature } from "@zk-email/helpers/dist/dkim"
+import { generateCircuitInputs } from "@zk-email/helpers/dist/input-helpers"
+import { useNavigate } from "react-router-dom"
 import Feedback from "../../contract-artifacts/Feedback.json"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
@@ -23,15 +22,9 @@ import SemaphoreContext from "../context/SemaphoreContext"
 import IconRefreshLine from "../icons/IconRefreshLine"
 import DragAndDropTextBox from "../components/DragAndDropTextBox"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
-import { verifyDKIMSignature } from "@zk-email/helpers/dist/dkim"
-import { generateCircuitInputs } from "@zk-email/helpers/dist/input-helpers"
-
-const fileTypes = ["eml"]
-
-const { publicRuntimeConfig: env } = getNextConfig()
 
 export default function GroupsPage() {
-    const router = useRouter()
+    const navigate = useNavigate()
     const { setLogs } = useContext(LogsContext)
     const { _users, refreshUsers, addUser } = useContext(SemaphoreContext)
     const [_loading, setLoading] = useBoolean()
@@ -42,7 +35,7 @@ export default function GroupsPage() {
         const identityString = localStorage.getItem("identity")
 
         if (!identityString) {
-            router.push("/")
+            navigate("/")
             return
         }
 
@@ -65,13 +58,15 @@ export default function GroupsPage() {
 
         let response: any
 
-        if (env.OPENZEPPELIN_AUTOTASK_WEBHOOK) {
-            response = await fetch(env.OPENZEPPELIN_AUTOTASK_WEBHOOK, {
+        // @ts-ignore
+        if (import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK) {
+            response = await fetch(import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     abi: Feedback.abi,
-                    address: env.FEEDBACK_CONTRACT_ADDRESS,
+                    // @ts-ignore
+                    address: import.meta.env.VITE_FEEDBACK_CONTRACT_ADDRESS,
                     functionName: "joinGroup",
                     functionParameters: [_identity.commitment.toString()]
                 })
@@ -145,9 +140,12 @@ export default function GroupsPage() {
             return
         }
         setLoading.on()
-        const endponit = env.SINDRIA_API_URL
-        const api_key = env.SINDRIA_API_KEY
-        const circuit_id = env.SINDRIA_CIRCUIT_ID
+        // @ts-ignore
+        const endponit = import.meta.env.VITE_SINDRIA_API_URL
+        // @ts-ignore
+        const api_key = import.meta.env.VITE_SINDRIA_API_KEY
+        // @ts-ignore
+        const circuit_id = import.meta.env.VITE_SINDRIA_CIRCUIT_ID
         const headers = {
             Accept: "application/json",
             Authorization: `Bearer ${api_key}`
@@ -229,8 +227,8 @@ export default function GroupsPage() {
             <Divider pt="6" borderColor="gray" />
             <Stepper
                 step={2}
-                onPrevClick={() => router.push("/")}
-                onNextClick={_identity && userHasJoined(_identity) ? () => router.push("/proofs") : undefined}
+                onPrevClick={() => navigate("/")}
+                onNextClick={_identity && userHasJoined(_identity) ? () => navigate("/proofs") : undefined}
             />
         </>
     )

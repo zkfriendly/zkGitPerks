@@ -3,9 +3,9 @@ import { Group } from "@semaphore-protocol/group"
 import { Identity } from "@semaphore-protocol/identity"
 import { generateProof } from "@semaphore-protocol/proof"
 import { BigNumber, utils } from "ethers"
-import getNextConfig from "next/config"
-import { useRouter } from "next/router"
 import { useCallback, useContext, useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { GROUP_ID } from "../constants"
 import Feedback from "../../contract-artifacts/Feedback.json"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
@@ -13,10 +13,8 @@ import SemaphoreContext from "../context/SemaphoreContext"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
 import IconRefreshLine from "../icons/IconRefreshLine"
 
-const { publicRuntimeConfig: env } = getNextConfig()
-
 export default function ProofsPage() {
-    const router = useRouter()
+    const navigate = useNavigate()
     const { setLogs } = useContext(LogsContext)
     const { _users, _feedback, refreshFeedback, addFeedback } = useContext(SemaphoreContext)
     const [_loading, setLoading] = useBoolean()
@@ -26,7 +24,7 @@ export default function ProofsPage() {
         const identityString = localStorage.getItem("identity")
 
         if (!identityString) {
-            router.push("/")
+            navigate("/")
             return
         }
 
@@ -52,26 +50,24 @@ export default function ProofsPage() {
             setLogs(`Posting your anonymous feedback...`)
 
             try {
-                const group = new Group(env.GROUP_ID, 20, _users)
+                const group = new Group(GROUP_ID, 20, _users)
 
                 const signal = BigNumber.from(utils.formatBytes32String(feedback)).toString()
 
-                const { proof, merkleTreeRoot, nullifierHash } = await generateProof(
-                    _identity,
-                    group,
-                    env.GROUP_ID,
-                    signal
-                )
+                const { proof, merkleTreeRoot, nullifierHash } = await generateProof(_identity, group, GROUP_ID, signal)
 
                 let response: any
 
-                if (env.OPENZEPPELIN_AUTOTASK_WEBHOOK) {
-                    response = await fetch(env.OPENZEPPELIN_AUTOTASK_WEBHOOK, {
+                // @ts-ignore
+                if (import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK) {
+                    // @ts-ignore
+                    response = await fetch(import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({
                             abi: Feedback.abi,
-                            address: env.FEEDBACK_CONTRACT_ADDRESS,
+                            // @ts-ignore
+                            address: import.meta.env.VITE_FEEDBACK_CONTRACT_ADDRESS,
                             functionName: "sendFeedback",
                             functionParameters: [signal, merkleTreeRoot, nullifierHash, proof]
                         })
@@ -159,7 +155,7 @@ export default function ProofsPage() {
 
             <Divider pt="6" borderColor="gray" />
 
-            <Stepper step={3} onPrevClick={() => router.push("/groups")} />
+            <Stepper step={3} onPrevClick={() => navigate("/groups")} />
         </>
     )
 }
