@@ -11,10 +11,10 @@ import {
     VStack
 } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
-import { useCallback, useContext, useEffect, useState } from "react"
-import { verifyDKIMSignature } from "@zk-email/helpers/dist/dkim"
-import { generateCircuitInputs } from "@zk-email/helpers/dist/input-helpers"
+import { useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { useContractAddress } from "../hooks/useContractAddress"
+import { GATEKEEPER_CONTRACT_ADDRESS_MAP } from "../constants/addresses"
 import Feedback from "../../contract-artifacts/Feedback.json"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
@@ -22,6 +22,7 @@ import SemaphoreContext from "../context/SemaphoreContext"
 import IconRefreshLine from "../icons/IconRefreshLine"
 import DragAndDropTextBox from "../components/DragAndDropTextBox"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
+import { useGateKeeperRepository } from "../abis/types/generated"
 
 export default function GroupsPage() {
     const navigate = useNavigate()
@@ -30,6 +31,32 @@ export default function GroupsPage() {
     const [_loading, setLoading] = useBoolean()
     const [_identity, setIdentity] = useState<Identity>()
     const [emailFull, setEmailFull] = useState<string>("")
+    const gateKeeperAddress = useContractAddress(GATEKEEPER_CONTRACT_ADDRESS_MAP)
+
+    const { data: repositoryNameChunks } = useGateKeeperRepository({
+        address: gateKeeperAddress
+    })
+
+    const repositoryName = useMemo(() => {
+        if (!repositoryNameChunks) return undefined
+        let name = ""
+        repositoryNameChunks.forEach((nameChunk) => {
+            let chunk = BigInt(nameChunk)
+            const buffer = new ArrayBuffer(256)
+            const dataView = new DataView(buffer)
+
+            for (let i = 0; i < 256; i++) {
+                dataView.setUint8(i, Number(chunk & BigInt(0xff)))
+                chunk >>= BigInt(8)
+            }
+
+            const uint8Array = new Uint8Array(buffer)
+            const decoder = new TextDecoder()
+            const text = decoder.decode(uint8Array)
+            name += text.indexOf("\0") !== -1 ? text.slice(0, text.indexOf("\0")) : text
+        })
+        return name
+    }, [repositoryNameChunks])
 
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
@@ -117,11 +144,17 @@ export default function GroupsPage() {
             </Heading>
             <Stack spacing={2}>
                 <Text color="green.900">
-                    Join the contributors club to enjoy all the available perks and benefits. You can{" "}
-                    <Highlight query={["ananymously"]} styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}>
-                        ananymously
+                    Join the{" "}
+                    {repositoryName && (
+                        <a href={`https://github.com/${repositoryName}`} target="_blank" style={{ color: "#0072f0" }}>
+                            {repositoryName}
+                        </a>
+                    )}{" "}
+                    contributors club to enjoy all the available perks and benefits. You can{" "}
+                    <Highlight query={["anonymously"]} styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}>
+                        anonymously
                     </Highlight>
-                    claim reimbursments on event tickets, travel expenses, and much more. 💰
+                    claim reimbursements on event tickets, travel expenses, and much more. 💰
                 </Text>
                 <Text color="blue.500">
                     But first you need to prove your a contributor. upload an email you rceived that shows your PR was
