@@ -21,9 +21,9 @@ contract GateKeeper is IGateKeeperMeta {
     uint public totalContributors;
     uint public totalDonators;
 
-    constructor(address _semaphore, address _groth16verifier, uint _repoNameChunk1, uint _repoNameChunk2) {
+    constructor(address _semaphore, address _verifier, uint _repoNameChunk1, uint _repoNameChunk2) {
         semaphore = _semaphore;
-        groth16verifier = _groth16verifier;
+        groth16verifier = _verifier;
         repository = RepositoryName(_repoNameChunk1, _repoNameChunk2);
 
         // generate random group ids

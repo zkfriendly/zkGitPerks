@@ -19,8 +19,9 @@ function getNetworks(): NetworksUserConfig {
         return {}
     }
 
-    const accounts = [`0x${process.env.ETHEREUM_PRIVATE_KEY}`]
+    const accounts = [`0x${process.env.ETHEREUM_PRIVATE_KEY}`, `0x${process.env.DEPLOYER_PRIVATE_KEY}`]
     const infuraApiKey = process.env.INFURA_API_KEY
+    const alchemyApiKey = process.env.ALCHEMY_API_KEY
 
     return {
         goerli: {
@@ -29,7 +30,7 @@ function getNetworks(): NetworksUserConfig {
             accounts
         },
         sepolia: {
-            url: `https://sepolia.infura.io/v3/${infuraApiKey}`,
+            url: `https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`,
             chainId: 11155111,
             accounts
         },
@@ -56,6 +57,9 @@ function getNetworks(): NetworksUserConfig {
     }
 }
 
+const accounts = [`0x${process.env.DEPLOYER_PRIVATE_KEY}`]
+const alchemyApiKey = process.env.ALCHEMY_API_KEY
+
 const hardhatConfig: HardhatUserConfig = {
     solidity: config.solidity,
     paths: {
@@ -67,6 +71,11 @@ const hardhatConfig: HardhatUserConfig = {
     networks: {
         hardhat: {
             chainId: 1337
+        },
+        sepolia: {
+            url: `https://eth-sepolia.g.alchemy.com/v2/${alchemyApiKey}`,
+            chainId: 11155111,
+            accounts
         },
         ...getNetworks()
     },

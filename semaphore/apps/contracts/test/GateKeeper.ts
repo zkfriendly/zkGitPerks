@@ -5,7 +5,7 @@ import { expect } from "chai"
 import { formatBytes32String } from "ethers/lib/utils"
 import { run } from "hardhat"
 // @ts-ignore: typechain folder will be generated after contracts compilation
-import { Feedback, GateKeeper, Semaphore, Groth16Verifier, IERC20__factory } from "../build/typechain"
+import { Feedback, GateKeeper, Semaphore, PrVerifier, IERC20__factory } from "../build/typechain"
 import valid_proof_1 from "./sample_proof/valid_proof_1.json"
 import valid_proof_2 from "./sample_proof/valid_proof_2.json"
 import { ethers } from "hardhat"
@@ -14,7 +14,7 @@ import { config } from "../package.json"
 
 describe("GateKeeper", () => {
     let gateKeeper: GateKeeper
-    let prVerifier: Groth16Verifier
+    let prVerifier: PrVerifier
     let semaphoreContract: Semaphore
     const users: Identity[] = []
 
