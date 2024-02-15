@@ -5,8 +5,8 @@ mkdir -p artifacts # Ensure the artifacts directory exists
 mkdir -p artifacts/${1}
 npx ts-node src/${1}/scripts/inputs.ts
 
-# echo "Compiling circuit..."
-# circom -l lib -l node_modules src/${1}/circuits/circuit.circom -o artifacts/${1} --r1cs --wasm --sym --c
+echo "Compiling circuit..."
+circom -l lib -l node_modules src/${1}/circuits/circuit.circom -o artifacts/${1} --r1cs --wasm --sym --c
 
 echo "Generating witness..."
 node artifacts/${1}/circuit_js/generate_witness.js artifacts/${1}/circuit_js/circuit.wasm artifacts/${1}/input.json artifacts/${1}/witness.wtns

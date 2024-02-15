@@ -1,39 +1,79 @@
+import { SupportedNetwork } from "@semaphore-protocol/data"
 import { generateCircuitInputs } from "@zk-email/helpers"
 import { verifyDKIMSignature } from "@zk-email/helpers/dist/dkim"
 import { rawEmailToBuffer } from "@zk-email/helpers/dist/input-helpers"
 
-// async function getProofInputs(emailFull: string, owner: string) {
-//     const STRING_PRESELECTOR = "Merged #"
-//     const TO_SELECTOR = "to:"
-//     const MAX_HEADER_PADDED_BYTES = 2048
-//     const MAX_BODY_PADDED_BYTES = 3072
+enum RevealType {
+    HEADER = "header",
+    BODY = "body"
+}
 
-//     const emailBuffer = rawEmailToBuffer(emailFull) // Cleaned email as buffer
+export async function getProofInputs(
+    emailFull: string,
+    preSelector: string,
+    revealSelector: string,
+    revealType: RevealType,
+    maxMessageLength: number,
+    maxBodyLength: number,
+    owner: string
+) {
+    const emailBuffer = rawEmailToBuffer(emailFull)
+    const dkimResult = await verifyDKIMSignature(emailBuffer)
+    const emailVerifierInputs = generateCircuitInputs({
+        rsaSignature: dkimResult.signature,
+        rsaPublicKey: dkimResult.publicKey,
+        body: dkimResult.body,
+        bodyHash: dkimResult.bodyHash,
+        message: dkimResult.message,
+        shaPrecomputeSelector: preSelector,
+        maxMessageLength,
+        maxBodyLength
+    })
 
-//     const dkimResult = await verifyDKIMSignature(emailBuffer)
+    let toIndex
 
-//     const emailVerifierInputs = generateCircuitInputs({
-//         rsaSignature: dkimResult.signature,
-//         rsaPublicKey: dkimResult.publicKey,
-//         body: dkimResult.body,
-//         bodyHash: dkimResult.bodyHash,
-//         message: dkimResult.message,
-//         shaPrecomputeSelector: STRING_PRESELECTOR,
-//         maxMessageLength: MAX_HEADER_PADDED_BYTES,
-//         maxBodyLength: MAX_BODY_PADDED_BYTES
-//     })
+    if (revealType === RevealType.HEADER) {
+        const header = emailVerifierInputs.in_padded.map((x) => Number(x))
+        const selectorBuffer = Buffer.from(revealSelector)
+        toIndex = Buffer.from(header).indexOf(selectorBuffer) + selectorBuffer.length
+    } else {
+        const body = emailVerifierInputs.in_body_padded!.map((x) => Number(x))
+        const selectorBuffer = Buffer.from(revealSelector)
+        toIndex = Buffer.from(body).indexOf(selectorBuffer) + selectorBuffer.length
+    }
 
-//     // const header = emailVerifierInputs.in_padded.map((x) => Number(x))
-//     // const selectorBuffer = Buffer.from(TO_SELECTOR)
-//     // const toIndex = Buffer.from(header).indexOf(selectorBuffer) + selectorBuffer.length
+    return {
+        ...emailVerifierInputs,
+        to_index: toIndex.toString(),
+        owner
+    }
+}
 
-//     // const inputJson = {
-//     //     ...emailVerifierInputs,
-//     //     to_index: toIndex.toString(),
-//     //     owner
-//     // }
+export function generateProof(proof_input: any, circuit_id: string) {
+    // @ts-ignore
+    const endponit = import.meta.env.VITE_SINDRIA_API_URL
+    // @ts-ignore
+    const api_key = import.meta.env.VITE_SINDRIA_API_KEY
 
-//     return {}
-// }
+    const headers = {
+        Accept: "application/json",
+        Authorization: `Bearer ${api_key}`
+    }
+    const data = {
+        proof_input,
+        perform_verify: true
+    }
 
-// export default getProofInputs
+    fetch(`${endponit}/circuits/${circuit_id}/prove`, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(data)
+    })
+        .then((res) => res.json())
+        .then((res) => {
+            console.log(res)
+        })
+        .catch((err) => {
+            console.error(err)
+        })
+}
