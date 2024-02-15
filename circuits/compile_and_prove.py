@@ -24,9 +24,8 @@ headers_json = {
     "Authorization": f"Bearer {API_KEY}"
 }
 
-def deploy_circuit():
+def deploy_circuit(circuit_upload_path):
     # Create a tar archive of the circuit and upload via byte stream
-    circuit_upload_path = "circuits"
     fh = io.BytesIO()
     with tarfile.open(fileobj=fh, mode='w:gz') as tar:
         tar.add(circuit_upload_path, arcname="upload.tar.gz")
@@ -46,7 +45,8 @@ def deploy_circuit():
     return response.json().get("circuit_id")  # Obtain circuit_id
 
 def main():
-    circuit_id = "1b55da13-77d8-4913-944f-d8f6f07d13d9"
+    circuit_upload_path = input("Enter the path to the circuit file: ")
+    circuit_id = deploy_circuit(circuit_upload_path)
 
     # Poll circuit detail unitl it has a status of Ready or Failed
     TIMEOUT = 600  # timeout after 10 minutes
