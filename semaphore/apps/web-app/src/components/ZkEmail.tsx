@@ -32,8 +32,6 @@ export function ZkEmail({ identity, circuitId, getProofInputs, onProofGenerated 
             Authorization: `Bearer ${apiKey}`
         }
 
-        console.log(headers)
-
         const data = {
             proof_input: JSON.stringify(await getProofInputs(emailFull, identity.commitment.toString())),
             perform_verify: true
@@ -45,7 +43,6 @@ export function ZkEmail({ identity, circuitId, getProofInputs, onProofGenerated 
             })
             .then((res) => {
                 setLogs(`Proof is being generated... 🤖 this could take a few minuts. proof id: ${res.data.proof_id}`)
-                console.log(res)
 
                 const interval = setInterval(() => {
                     axios
