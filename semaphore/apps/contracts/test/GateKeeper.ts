@@ -8,10 +8,8 @@ import { run } from "hardhat"
 import { Feedback, GateKeeper, Semaphore, Groth16Verifier, IERC20__factory } from "../build/typechain"
 import valid_proof_1 from "./sample_proof/valid_proof_1.json"
 import valid_proof_2 from "./sample_proof/valid_proof_2.json"
-
 import { ethers } from "hardhat"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
-import { MockContract, deployMockContract } from "ethereum-waffle"
 import { config } from "../package.json"
 
 describe("GateKeeper", () => {
