@@ -18,16 +18,16 @@ const { publicRuntimeConfig: env } = getNextConfig()
 
 export default function App({ Component, pageProps }: AppProps) {
     const router = useRouter()
-    const semaphore = useSemaphore({ groupId: env.GROUP_ID })
+    // const semaphore = useSemaphore({ groupId: env.GROUP_ID })
     const [_logs, setLogs] = useState<string>("")
 
-    useEffect(() => {
-        semaphore.refreshUsers()
-        semaphore.refreshFeedback()
-    }, [])
+    // useEffect(() => {
+    //     semaphore.refreshUsers()
+    //     semaphore.refreshFeedback()
+    // }, [])
 
     return (
-        <React.StrictMode>
+        <>
             <Head>
                 <title>Semaphore boilerplate</title>
                 <link rel="icon" href="/favicon.ico" />
@@ -45,16 +45,16 @@ export default function App({ Component, pageProps }: AppProps) {
 
                     <Container maxW="lg" flex="1" display="flex" alignItems="center">
                         <Stack py="8" display="flex" width="100%">
-                            <SemaphoreContext.Provider value={semaphore}>
-                                <LogsContext.Provider
-                                    value={{
-                                        _logs,
-                                        setLogs
-                                    }}
-                                >
-                                    <Component {...pageProps} />
-                                </LogsContext.Provider>
-                            </SemaphoreContext.Provider>
+                            {/* <SemaphoreContext.Provider value={null}> */}
+                            <LogsContext.Provider
+                                value={{
+                                    _logs,
+                                    setLogs
+                                }}
+                            >
+                                <Component {...pageProps} />
+                            </LogsContext.Provider>
+                            {/* </SemaphoreContext.Provider> */}
                         </Stack>
                     </Container>
 
@@ -72,6 +72,6 @@ export default function App({ Component, pageProps }: AppProps) {
                     </HStack>
                 </ChakraProvider>
             </Web3ReactProvider>
-        </React.StrictMode>
+        </>
     )
 }

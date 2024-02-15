@@ -22,7 +22,8 @@ const nextConfig = withPWA({
         INFURA_API_KEY: process.env.INFURA_API_KEY,
         ETHEREUM_PRIVATE_KEY: process.env.ETHEREUM_PRIVATE_KEY,
         FEEDBACK_CONTRACT_ADDRESS: process.env.FEEDBACK_CONTRACT_ADDRESS,
-        SEMAPHORE_CONTRACT_ADDRESS: process.env.SEMAPHORE_CONTRACT_ADDRESS
+        SEMAPHORE_CONTRACT_ADDRESS: process.env.SEMAPHORE_CONTRACT_ADDRESS,
+        SINDRI_API_URL: process.env.SINDRI_API_URL
     },
     publicRuntimeConfig: {
         DEFAULT_NETWORK: process.env.DEFAULT_NETWORK,

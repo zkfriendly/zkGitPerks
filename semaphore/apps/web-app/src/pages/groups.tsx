@@ -141,9 +141,6 @@ export default function GroupsPage() {
     }
 
     const generateEmailProof = useCallback(async () => {
-        if (!_identity) {
-            return
-        }
         setLoading.on()
         const endponit = env.SINDRIA_API_URL
         const api_key = env.SINDRIA_API_KEY
@@ -153,9 +150,11 @@ export default function GroupsPage() {
             Authorization: `Bearer ${api_key}`
         }
         const data = {
-            proof_input: getProofInputs(emailFull, _identity.commitment.toString()),
+            proof_input: await getProofInputs(emailFull, _identity!.commitment.toString()),
             perform_verify: true
         }
+
+        console.log(data)
 
         fetch(`${endponit}/circuits/${circuit_id}/prove`, {
             method: "POST",
