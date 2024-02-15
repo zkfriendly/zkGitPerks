@@ -2,17 +2,18 @@ import { Button, Divider, Heading, Highlight, HStack, Stack, Text, useBoolean, V
 import { Identity } from "@semaphore-protocol/identity"
 import { useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
+import { prepareWriteContract, waitForTransaction, writeContract } from "@wagmi/core"
 import { useContractAddress } from "../hooks/useContractAddress"
 import { GATEKEEPER_CONTRACT_ADDRESS_MAP } from "../constants/addresses"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
 import IconRefreshLine from "../icons/IconRefreshLine"
-import IconAddCircleFill from "../icons/IconAddCircleFill"
 import { ZkEmail } from "../components/ZkEmail"
 import { getPrProofInputs } from "../lib/input"
 import { PR_CIRCUIT_ID } from "../constants"
-import { useGateKeeperRepository } from "../abis/types/generated"
+import { gateKeeperABI, useGateKeeperRepository } from "../abis/types/generated"
+import { TransactionState } from "../types"
 
 export default function GroupsPage() {
     const navigate = useNavigate()
@@ -66,6 +67,34 @@ export default function GroupsPage() {
     }, [_users])
 
     const userHasJoined = useCallback((identity: Identity) => _users.includes(identity.commitment.toString()), [_users])
+
+    const [txState, setTxState] = useState(TransactionState.INITIAL)
+    const joinContributors = useCallback(async () => {
+        if (txState !== TransactionState.INITIAL) return
+        try {
+            setTxState(TransactionState.PREPARING_TRANSACTION)
+            const { request } = await prepareWriteContract({
+                address: gateKeeperAddress,
+                abi: gateKeeperABI,
+                functionName: "joinContributors",
+                // TODO: pass the arguments
+                // @ts-ignore
+                args: []
+            })
+            setTxState(TransactionState.AWAITING_USER_APPROVAL)
+            // TODO: remove this ts-ignore after passing args to request
+            // @ts-ignore
+            const { hash } = await writeContract(request)
+            setTxState(TransactionState.AWAITING_TRANSACTION)
+            await waitForTransaction({
+                hash
+            })
+            alert("transaction completed!")
+        } catch (e) {
+            alert(`Error: ${String(e)}`)
+        }
+        setTxState(TransactionState.INITIAL)
+    }, [txState])
 
     return (
         <>

@@ -1,10 +1,10 @@
 import { useContext, useState } from "react"
-import DragAndDropTextBox from "../components/DragAndDropTextBox"
-import { Button, Text, Textarea, VStack } from "@chakra-ui/react"
-import IconAddCircleFill from "../icons/IconAddCircleFill"
+import { Button, Text, Textarea } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
-import LogsContext from "../context/LogsContext"
 import axios from "axios"
+import DragAndDropTextBox from "../components/DragAndDropTextBox"
+import IconAddCircleFill from "../icons/IconAddCircleFill"
+import LogsContext from "../context/LogsContext"
 
 type ZkEmailProps = {
     identity: Identity
@@ -40,7 +40,7 @@ export function ZkEmail({ identity, circuitId, getProofInputs }: ZkEmailProps) {
 
         axios
             .post(`${endponit}/circuit/${circuitId}/prove`, data, {
-                headers: headers
+                headers
             })
             .then((res) => {
                 setLogs(`Proof is being generated... 🤖 this could take a few minuts. proof id: ${res.data.proof_id}`)
