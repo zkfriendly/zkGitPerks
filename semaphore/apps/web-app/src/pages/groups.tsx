@@ -9,6 +9,7 @@ import IconRefreshLine from "../icons/IconRefreshLine"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
 import { ZkEmail } from "../components/ZkEmail"
 import { getPrProofInputs } from "../lib/input"
+import { PR_CIRCUIT_ID } from "../constants"
 
 export default function GroupsPage() {
     const navigate = useNavigate()
@@ -64,7 +65,7 @@ export default function GroupsPage() {
                     Refresh
                 </Button>
             </HStack>
-            <ZkEmail getProofInputs={getPrProofInputs} identity={_identity!} />
+            <ZkEmail circuitId={PR_CIRCUIT_ID} getProofInputs={getPrProofInputs} identity={_identity!} />
             {_users.length > 0 && (
                 <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
                     {_users.map((user, i) => (
