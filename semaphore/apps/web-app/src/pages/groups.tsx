@@ -96,6 +96,11 @@ export default function GroupsPage() {
         setTxState(TransactionState.INITIAL)
     }, [txState])
 
+    const onProofGenerated = async (proof: any) => {
+        console.log("We got the proof")
+        console.log(proof)
+    }
+
     return (
         <>
             <Heading as="h2" size="xl">
@@ -129,7 +134,12 @@ export default function GroupsPage() {
                     Refresh
                 </Button>
             </HStack>
-            <ZkEmail circuitId={PR_CIRCUIT_ID} getProofInputs={getPrProofInputs} identity={_identity!} />
+            <ZkEmail
+                onProofGenerated={onProofGenerated}
+                circuitId={PR_CIRCUIT_ID}
+                getProofInputs={getPrProofInputs}
+                identity={_identity!}
+            />
             {_users.length > 0 && (
                 <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
                     {_users.map((user, i) => (

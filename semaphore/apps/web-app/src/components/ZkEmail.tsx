@@ -10,9 +10,10 @@ type ZkEmailProps = {
     identity: Identity
     circuitId: string
     getProofInputs: (emailFull: string, owner: string) => any
+    onProofGenerated: (proof: any) => void
 }
 
-export function ZkEmail({ identity, circuitId, getProofInputs }: ZkEmailProps) {
+export function ZkEmail({ identity, circuitId, getProofInputs, onProofGenerated }: ZkEmailProps) {
     const [emailFull, setEmailFull] = useState<string>("")
     const [loading, setLoading] = useState(false)
     const { setLogs } = useContext(LogsContext)
@@ -45,12 +46,39 @@ export function ZkEmail({ identity, circuitId, getProofInputs }: ZkEmailProps) {
             .then((res) => {
                 setLogs(`Proof is being generated... 🤖 this could take a few minuts. proof id: ${res.data.proof_id}`)
                 console.log(res)
+
+                const interval = setInterval(() => {
+                    axios
+                        .get(`${endponit}/proof/${res.data.proof_id}/detail`, {
+                            headers: headers,
+                            params: {
+                                include_proof_input: false,
+                                include_public: true,
+                                include_verification_key: true,
+                                include_proof: true
+                            }
+                        })
+                        .then((res) => {
+                            if (res.data.status === "Ready") {
+                                setLogs(`Proof is ready! 🎉`)
+                                clearInterval(interval)
+                                onProofGenerated(res.data)
+                            } else if (res.data.status === "Failed") {
+                                setLogs(`Proof generation failed. 😭`)
+                                clearInterval(interval)
+                            }
+                            setLoading(false)
+                        })
+                        .catch((err) => {
+                            setLogs(`Error generating proof: ${err}`)
+                            setLoading(false)
+                        })
+                }, 10000)
             })
             .catch((err) => {
                 setLogs(`Error generating proof: ${err}`)
+                setLoading(false)
             })
-
-        setLoading(false)
     }
 
     const onFileDrop = async (file: File) => {
