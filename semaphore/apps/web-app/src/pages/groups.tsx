@@ -1,27 +1,17 @@
-import {
-    Button,
-    Divider,
-    Heading,
-    Highlight,
-    HStack,
-    Stack,
-    Text,
-    Textarea,
-    useBoolean,
-    VStack
-} from "@chakra-ui/react"
+import { Button, Divider, Heading, Highlight, HStack, Stack, Text, useBoolean, VStack } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
 import { useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useContractAddress } from "../hooks/useContractAddress"
 import { GATEKEEPER_CONTRACT_ADDRESS_MAP } from "../constants/addresses"
-import Feedback from "../../contract-artifacts/Feedback.json"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
 import IconRefreshLine from "../icons/IconRefreshLine"
-import DragAndDropTextBox from "../components/DragAndDropTextBox"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
+import { ZkEmail } from "../components/ZkEmail"
+import { getPrProofInputs } from "../lib/input"
+import { PR_CIRCUIT_ID } from "../constants"
 import { useGateKeeperRepository } from "../abis/types/generated"
 
 export default function GroupsPage() {
@@ -75,67 +65,7 @@ export default function GroupsPage() {
         }
     }, [_users])
 
-    const joinGroup = useCallback(async () => {
-        if (!_identity) {
-            return
-        }
-
-        setLoading.on()
-        setLogs(`Joining the Feedback group...`)
-
-        let response: any
-
-        // @ts-ignore
-        if (import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK) {
-            // @ts-ignore
-            response = await fetch(import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    abi: Feedback.abi,
-                    // @ts-ignore
-                    address: import.meta.env.VITE_FEEDBACK_CONTRACT_ADDRESS,
-                    functionName: "joinGroup",
-                    functionParameters: [_identity.commitment.toString()]
-                })
-            })
-        } else {
-            response = await fetch("api/join", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    identityCommitment: _identity.commitment.toString()
-                })
-            })
-        }
-
-        if (response.status === 200) {
-            addUser(_identity.commitment.toString())
-
-            setLogs(`You joined the Feedback group event 🎉 Share your feedback anonymously!`)
-        } else {
-            setLogs("Some error occurred, please try again!")
-        }
-
-        setLoading.off()
-    }, [_identity])
-
     const userHasJoined = useCallback((identity: Identity) => _users.includes(identity.commitment.toString()), [_users])
-
-    const onFileDrop = async (file: File) => {
-        if (file.name.endsWith(".eml")) {
-            const content = await file.text()
-            setEmailFull(content)
-        } else {
-            alert("Only .eml files are allowed.")
-        }
-    }
-
-    const generateEmailProof = useCallback(async () => {
-        setLoading.on()
-
-        setLoading.off()
-    }, [])
 
     return (
         <>
@@ -170,22 +100,7 @@ export default function GroupsPage() {
                     Refresh
                 </Button>
             </HStack>
-            <DragAndDropTextBox onFileDrop={onFileDrop} />
-            <Text>or copy paste full PR email with headers</Text>
-            <Textarea value={emailFull} onChange={(e) => setEmailFull(e.target.value)}></Textarea>
-
-            <Button
-                w="100%"
-                fontWeight="bold"
-                justifyContent="left"
-                colorScheme="primary"
-                px="4"
-                onClick={generateEmailProof}
-                isDisabled={_loading || !_identity || userHasJoined(_identity) || !emailFull}
-                leftIcon={<IconAddCircleFill />}
-            >
-                Generate zk proof
-            </Button>
+            <ZkEmail circuitId={PR_CIRCUIT_ID} getProofInputs={getPrProofInputs} identity={_identity!} />
             {_users.length > 0 && (
                 <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
                     {_users.map((user, i) => (
