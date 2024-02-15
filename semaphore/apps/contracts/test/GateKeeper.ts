@@ -18,8 +18,6 @@ describe("GateKeeper", () => {
     let gateKeeper: GateKeeper
     let prVerifier: Groth16Verifier
     let semaphoreContract: Semaphore
-    let token: MockContract
-    const donationAmount = ethers.utils.parseEther("1")
     const users: Identity[] = []
 
     let user1: SignerWithAddress
@@ -27,9 +25,6 @@ describe("GateKeeper", () => {
 
     beforeEach(async () => {
         ;[user1, user2] = await ethers.getSigners()
-
-        //@ts-ignore
-        token = await deployMockContract(user1, IERC20__factory.abi)
 
         const { semaphore } = await run("deploy:semaphore", {
             logs: false
@@ -43,8 +38,6 @@ describe("GateKeeper", () => {
         gateKeeper = await GateKeeperFactory.deploy(
             semaphore.address,
             prVerifier.address,
-            token.address,
-            donationAmount,
             "0x0000000000000000000000006f614465766974616e2f796c646e656972666b7a",
             "0x0000000000000000000000000000000000000000000000000000000000000000"
         )
@@ -184,119 +177,6 @@ describe("GateKeeper", () => {
                 await expect(
                     //@ts-ignore
                     gateKeeper.validateContributorSignal([
-                        signal,
-                        scope,
-                        proof.merkleTreeRoot,
-                        proof.nullifierHash,
-                        proof.proof
-                    ])
-                ).to.be.revertedWithCustomError(semaphoreContract, "Semaphore__YouAreUsingTheSameNillifierTwice")
-            })
-        })
-    })
-
-    describe("Donators", () => {
-        it("should allow users to join by donating", async () => {
-            await token.mock.transferFrom.withArgs(user1.address, gateKeeper.address, donationAmount).returns(true)
-            const before = await gateKeeper.totalDonators()
-            await gateKeeper.joinDonators(users[0].commitment)
-            const after = await gateKeeper.totalDonators()
-
-            expect(after).to.equal(before.add(1))
-        })
-
-        describe("Signal Validation", () => {
-            it("should validate donator singal", async () => {
-                const gpId = await gateKeeper.DONATORS_GROUP_ID()
-                //@ts-ignore
-                const gp = new Group(gpId)
-
-                await token.mock.transferFrom.withArgs(user1.address, gateKeeper.address, donationAmount).returns(true)
-                await gateKeeper.joinDonators(users[0].commitment)
-                gp.addMember(users[0].commitment)
-
-                const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`
-                const zkeyFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.zkey`
-
-                const signal = formatBytes32String("donator")
-                const scope = 0
-                const proof = await generateProof(users[0], gp, scope, signal, {
-                    wasmFilePath,
-                    zkeyFilePath
-                })
-
-                //@ts-ignore
-                await gateKeeper.validateDonatorSignal([
-                    signal,
-                    scope,
-                    proof.merkleTreeRoot,
-                    proof.nullifierHash,
-                    proof.proof
-                ])
-            })
-
-            it("should not allow invalid donator singal", async () => {
-                const gpId = await gateKeeper.DONATORS_GROUP_ID()
-                //@ts-ignore
-                const gp = new Group(gpId)
-
-                await token.mock.transferFrom.withArgs(user1.address, gateKeeper.address, donationAmount).returns(true)
-                await gateKeeper.joinDonators(users[0].commitment)
-                gp.addMember(users[0].commitment)
-
-                const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`
-                const zkeyFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.zkey`
-
-                const signal = formatBytes32String("donator")
-                const scope = 0
-                const proof = await generateProof(users[0], gp, scope, signal, {
-                    wasmFilePath,
-                    zkeyFilePath
-                })
-
-                await expect(
-                    //@ts-ignore
-                    gateKeeper.validateDonatorSignal([
-                        formatBytes32String("invalid-signal"),
-                        scope,
-                        proof.merkleTreeRoot,
-                        proof.nullifierHash,
-                        proof.proof
-                    ])
-                ).to.be.revertedWithCustomError(gateKeeper, "InvalidProof")
-            })
-
-            it("should not be able to valide a signal more than once", async () => {
-                const gpId = await gateKeeper.DONATORS_GROUP_ID()
-                //@ts-ignore
-                const gp = new Group(gpId)
-
-                await token.mock.transferFrom.withArgs(user1.address, gateKeeper.address, donationAmount).returns(true)
-                await gateKeeper.joinDonators(users[0].commitment)
-                gp.addMember(users[0].commitment)
-
-                const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`
-                const zkeyFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.zkey`
-
-                const signal = formatBytes32String("donator")
-                const scope = 0
-                const proof = await generateProof(users[0], gp, scope, signal, {
-                    wasmFilePath,
-                    zkeyFilePath
-                })
-
-                //@ts-ignore
-                await gateKeeper.validateDonatorSignal([
-                    signal,
-                    scope,
-                    proof.merkleTreeRoot,
-                    proof.nullifierHash,
-                    proof.proof
-                ])
-
-                await expect(
-                    //@ts-ignore
-                    gateKeeper.validateDonatorSignal([
                         signal,
                         scope,
                         proof.merkleTreeRoot,
