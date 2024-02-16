@@ -77,6 +77,10 @@ const hardhatConfig: HardhatUserConfig = {
             chainId: 11155111,
             accounts
         },
+        scrollSepolia: {
+            url: "https://sepolia-rpc.scroll.io/" || "",
+            accounts
+        },
         ...getNetworks()
     },
     gasReporter: {
