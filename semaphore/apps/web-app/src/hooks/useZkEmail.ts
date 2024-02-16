@@ -96,7 +96,7 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
         return nstr
     }
 
-    async function groth16ExportSolidityCallData(proof: any, pub: any) {
+    function groth16ExportSolidityCallData(proof: any, pub: any) {
         let inputs = ""
         for (let i = 0; i < pub.length; i++) {
             if (inputs != "") inputs = inputs + ","
@@ -128,7 +128,8 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
         ]
         const _pC = rawProof.pi_c.slice(0, 2).map((x) => BigInt(x)) as [bigint, bigint]
 
-        groth16ExportSolidityCallData(rawProof, _pubSignals).then((calldata) => console.log(calldata))
+        const calldata = groth16ExportSolidityCallData(rawProof, _pubSignals)
+        console.log(calldata)
 
         return {
             _pA,
