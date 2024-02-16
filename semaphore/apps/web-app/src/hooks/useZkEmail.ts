@@ -91,7 +91,7 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
 
     function p256$2(n: number) {
         let nstr = n.toString(16)
-        while (nstr.length < 64) nstr = "0" + nstr
+        while (nstr.length < 64) nstr = `0${nstr}`
         nstr = `"0x${nstr}"`
         return nstr
     }
@@ -99,8 +99,8 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
     function groth16ExportSolidityCallData(proof: any, pub: any) {
         let inputs = ""
         for (let i = 0; i < pub.length; i++) {
-            if (inputs != "") inputs = inputs + ","
-            inputs = inputs + p256$2(pub[i])
+            if (inputs != "") inputs += ","
+            inputs += p256$2(pub[i])
         }
 
         let S
@@ -121,21 +121,44 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
             | [bigint, bigint, bigint, bigint, bigint]
             | undefined
         if (!rawProof || !_pubSignals) return undefined
-        const _pA = rawProof.pi_a.slice(0, 2).map((x) => BigInt(x)) as [bigint, bigint]
-        const _pB = rawProof.pi_b.slice(0, 2).map((x) => x.map((y) => BigInt(y))) as [
-            [bigint, bigint],
-            [bigint, bigint]
-        ]
-        const _pC = rawProof.pi_c.slice(0, 2).map((x) => BigInt(x)) as [bigint, bigint]
-
-        const calldata = groth16ExportSolidityCallData(rawProof, _pubSignals)
-        console.log(calldata)
-
+        // const _pA = rawProof.pi_a.slice(0, 2).map((x) => BigInt(x)) as [bigint, bigint]
+        // const _pB = rawProof.pi_b.slice(0, 2).map((x) => x.map((y) => BigInt(y))) as [
+        //     [bigint, bigint],
+        //     [bigint, bigint]
+        // ]
+        // const _pC = rawProof.pi_c.slice(0, 2).map((x) => BigInt(x)) as [bigint, bigint]
+        // return {
+        //     _pA,
+        //     _pB,
+        //     _pC,
+        //     _pubSignals
+        // }
         return {
-            _pA,
-            _pB,
-            _pC,
-            _pubSignals
+            _pA: [
+                "0x1d91f3d03dd546eb5e778fea071dd4d6f74514982b6d9f8f5c70416631ff3883",
+                "0x1ad8698497781d27e3b93a051f29d6d1173ebe07779f538fc37a3868bbeb70c1"
+            ].map((x) => BigInt(x)) as [bigint, bigint],
+            _pB: [
+                [
+                    "0x0e893842a745d362267311b6b99fc334984bb0bc38c1a1b81bb4fe2dc3923899",
+                    "0x2f4a4a33d875199b39456afcf0c4f010c0244064198d19bea9e2308919173b64"
+                ],
+                [
+                    "0x2bca93e25b3ebe683be8b41a85cfdaeece6751d371d34d6f9c0aa297b8409cb1",
+                    "0x0b12c27574a5a7b290e619ad5b72ddf04807ec9a8615b4a9396f400e184c0c64"
+                ]
+            ].map((x) => x.map((y) => BigInt(y))) as [[bigint, bigint], [bigint, bigint]],
+            _pC: [
+                "0x2d626a2c7bfb2031ca498e0705802a3a9b480669f5de0de8ed283fb23f35e05b",
+                "0x1bdb11a9bfff28c3a04af6b0f1eb9855ea43a0f0a2385cf1334510007f8d8f75"
+            ].map((x) => BigInt(x)) as [bigint, bigint],
+            _pubSignals: [
+                "0x020f05965354925e866f3f2361322774800d1d925e5f069418c941a3a9a8b4d0",
+                "0x0cc55a1b6142459e7c5d9283742f36d09b0749906dea81bbb05d41c546ac95a5",
+                "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "0x0000000000000000000000006f614465766974616e2f796c646e656972666b7a",
+                "0x0000000000000000000000000000000000000000000000000000000000000000"
+            ].map((x) => BigInt(x)) as [bigint, bigint, bigint, bigint, bigint]
         }
     }, [generatedProof])
 
