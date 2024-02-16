@@ -10401,7 +10401,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ffjavascript@npm:^0.2.48":
+"ffjavascript@npm:0.2.63, ffjavascript@npm:^0.2.48":
   version: 0.2.63
   resolution: "ffjavascript@npm:0.2.63"
   dependencies:
@@ -15590,6 +15590,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"r1csfile@npm:0.0.47":
+  version: 0.0.47
+  resolution: "r1csfile@npm:0.0.47"
+  dependencies:
+    "@iden3/bigarray": 0.0.2
+    "@iden3/binfileutils": 0.0.11
+    fastfile: 0.0.20
+    ffjavascript: 0.2.60
+  checksum: edeb325b83851a71cbca2e5de56eb622ee5347ecae921b526a5fc484c4825b6b30c73b6fde40e9bc5112b9d21e046af885bf212ed9cee2efbc6de93b8454ec06
+  languageName: node
+  linkType: hard
+
 "radix3@npm:^1.1.0":
   version: 1.1.0
   resolution: "radix3@npm:1.1.0"
@@ -16823,6 +16835,26 @@ __metadata:
   bin:
     snarkjs: build/cli.cjs
   checksum: f2050f0135d50d459ea0edddf3e394e833a2d28c6648e5889b2f896814865e5c60606e978a8a106bd5bfe7e27501c315f249db5b71895d5e7e6e9a87bfcd55ab
+  languageName: node
+  linkType: hard
+
+"snarkjs@npm:^0.7.3":
+  version: 0.7.3
+  resolution: "snarkjs@npm:0.7.3"
+  dependencies:
+    "@iden3/binfileutils": 0.0.11
+    bfj: ^7.0.2
+    blake2b-wasm: ^2.4.0
+    circom_runtime: 0.1.24
+    ejs: ^3.1.6
+    fastfile: 0.0.20
+    ffjavascript: 0.2.63
+    js-sha3: ^0.8.0
+    logplease: ^1.2.15
+    r1csfile: 0.0.47
+  bin:
+    snarkjs: build/cli.cjs
+  checksum: 6a8818c0f23b1c213b3296b4a253ceb2f26accfd0259274230550dfce010e4c6d1f5ecaaea1d84ff9b9da54c42dc94869f820838af4e33ffd4e09d95e986d9ee
   languageName: node
   linkType: hard
 
@@ -18777,6 +18809,7 @@ __metadata:
     react-drag-drop-files: ^2.3.10
     react-icons: ^4.8.0
     rollup-plugin-node-polyfills: ^0.2.1
+    snarkjs: ^0.7.3
     stream-browserify: ^3.0.0
     styled-components: ^6.1.8
     typescript: ^5.3.2

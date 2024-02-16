@@ -1,6 +1,8 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import axios from "axios"
 import { Identity } from "@semaphore-protocol/identity"
+// @ts-ignore
+import * as snarkjs from "snarkjs"
 import LogsContext from "../context/LogsContext"
 import { ProofObject, ZkProofStatus } from "../types"
 
@@ -89,53 +91,32 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
         }
     }, [generatedProof])
 
-    function p256$2(n: number) {
-        let nstr = n.toString(16)
-        while (nstr.length < 64) nstr = "0" + nstr
-        nstr = `"0x${nstr}"`
-        return nstr
-    }
+    const [processedProof, setProcessedProof] = useState<
+        | {
+              _pA: readonly [bigint, bigint]
+              _pB: readonly [readonly [bigint, bigint], readonly [bigint, bigint]]
+              _pC: readonly [bigint, bigint]
+              _pubSignals: readonly [bigint, bigint, bigint, bigint, bigint]
+          }
+        | undefined
+    >(undefined)
 
-    function groth16ExportSolidityCallData(proof: any, pub: any) {
-        let inputs = ""
-        for (let i = 0; i < pub.length; i++) {
-            if (inputs != "") inputs = inputs + ","
-            inputs = inputs + p256$2(pub[i])
-        }
-
-        let S
-        S =
-            `[${p256$2(proof.pi_a[0])}, ${p256$2(proof.pi_a[1])}],` +
-            `[[${p256$2(proof.pi_b[0][1])}, ${p256$2(proof.pi_b[0][0])}],[${p256$2(proof.pi_b[1][1])}, ${p256$2(
-                proof.pi_b[1][0]
-            )}]],` +
-            `[${p256$2(proof.pi_c[0])}, ${p256$2(proof.pi_c[1])}],` +
-            `[${inputs}]`
-
-        return S
-    }
-
-    const processedProof = useMemo(() => {
+    useEffect(() => {
         const rawProof = generatedProof?.proof
-        const _pubSignals = generatedProof?.public?.map((x) => BigInt(x)) as
-            | [bigint, bigint, bigint, bigint, bigint]
-            | undefined
-        if (!rawProof || !_pubSignals) return undefined
-        const _pA = rawProof.pi_a.slice(0, 2).map((x) => BigInt(x)) as [bigint, bigint]
-        const _pB = rawProof.pi_b.slice(0, 2).map((x) => x.map((y) => BigInt(y))) as [
-            [bigint, bigint],
-            [bigint, bigint]
-        ]
-        const _pC = rawProof.pi_c.slice(0, 2).map((x) => BigInt(x)) as [bigint, bigint]
-
-        const calldata = groth16ExportSolidityCallData(rawProof, _pubSignals)
-        console.log(calldata)
-
-        return {
-            _pA,
-            _pB,
-            _pC,
-            _pubSignals
+        const _pubSignals = generatedProof?.public
+        if (rawProof && _pubSignals) {
+            snarkjs.groth16.exportSolidityCallData(rawProof, _pubSignals).then((calldataStr: any) => {
+                const calldata = JSON.parse(`[${calldataStr}]`)
+                setProcessedProof({
+                    _pA: calldata[0].map((x: string) => BigInt(x)) as [bigint, bigint],
+                    _pB: calldata[1].map((x: string[]) => x.map((y) => BigInt(y))) as [
+                        [bigint, bigint],
+                        [bigint, bigint]
+                    ],
+                    _pC: calldata[2].map((x: string) => BigInt(x)) as [bigint, bigint],
+                    _pubSignals: calldata[3].map((x: string) => BigInt(x)) as [bigint, bigint, bigint, bigint, bigint]
+                })
+            })
         }
     }, [generatedProof])
 
