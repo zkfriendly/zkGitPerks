@@ -89,6 +89,32 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
         }
     }, [generatedProof])
 
+    function p256$2(n: number) {
+        let nstr = n.toString(16)
+        while (nstr.length < 64) nstr = "0" + nstr
+        nstr = `"0x${nstr}"`
+        return nstr
+    }
+
+    async function groth16ExportSolidityCallData(proof: any, pub: any) {
+        let inputs = ""
+        for (let i = 0; i < pub.length; i++) {
+            if (inputs != "") inputs = inputs + ","
+            inputs = inputs + p256$2(pub[i])
+        }
+
+        let S
+        S =
+            `[${p256$2(proof.pi_a[0])}, ${p256$2(proof.pi_a[1])}],` +
+            `[[${p256$2(proof.pi_b[0][1])}, ${p256$2(proof.pi_b[0][0])}],[${p256$2(proof.pi_b[1][1])}, ${p256$2(
+                proof.pi_b[1][0]
+            )}]],` +
+            `[${p256$2(proof.pi_c[0])}, ${p256$2(proof.pi_c[1])}],` +
+            `[${inputs}]`
+
+        return S
+    }
+
     const processedProof = useMemo(() => {
         const rawProof = generatedProof?.proof
         const _pubSignals = generatedProof?.public?.map((x) => BigInt(x)) as
@@ -101,6 +127,9 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
             [bigint, bigint]
         ]
         const _pC = rawProof.pi_c.slice(0, 2).map((x) => BigInt(x)) as [bigint, bigint]
+
+        groth16ExportSolidityCallData(rawProof, _pubSignals).then((calldata) => console.log(calldata))
+
         return {
             _pA,
             _pB,
