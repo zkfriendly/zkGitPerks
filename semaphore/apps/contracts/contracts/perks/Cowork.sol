@@ -3,6 +3,10 @@ pragma solidity ^0.8.4;
 import "../interfaces/IGateKeeperMeta.sol";
 import "../interfaces/ICoworkVerifier.sol";
 
+interface IERC20 {
+    function transfer(address to, uint256 amount) external returns (bool);
+}
+
 /// @title Devconnect Coworking Space ticket reimbursement contract
 /// @author zkfriendly
 /// @notice This contract is used to reimburse the ticket of the coworking space based on a given gatekeeper
@@ -26,6 +30,8 @@ contract Cowork {
         uint[3] _pubSignals;
     }
 
+    event Claimed(address indexed contributor, uint256 amount);
+
     error InvalidProof();
 
     constructor(address _gateKeeper, address _token, uint256 _ticketPrice, address _verifier) {
@@ -47,6 +53,9 @@ contract Cowork {
         );
         if (!ICoworkVerifier(groth16verifier).verifyProof(proof._pA, proof._pB, proof._pC, proof._pubSignals))
             revert InvalidProof();
+
+        require(IERC20(token).transfer(msg.sender, ticketPrice));
+        emit Claimed(msg.sender, ticketPrice);
     }
 
     function getScope() public view returns (uint256) {
