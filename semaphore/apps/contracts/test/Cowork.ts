@@ -73,7 +73,8 @@ describe("Cowork", async () => {
             nullifierHash: commitmentProof.nullifierHash,
             proof: commitmentProof.proof
         }
+        await token.mock.transfer.withArgs(signer.address, ticketPrice).returns(true)
         //@ts-ignore
-        await coworkContract.claim(gateKeeperProof, coworkProof.calldata)
+        await coworkContract.connect(signer).claim(gateKeeperProof, coworkProof.calldata)
     })
 })
