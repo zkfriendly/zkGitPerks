@@ -6,14 +6,15 @@ import { formatBytes32String } from "ethers/lib/utils"
 import { run } from "hardhat"
 // @ts-ignore: typechain folder will be generated after contracts compilation
 import { GateKeeper, Semaphore, PrVerifier, IERC20__factory } from "../build/typechain"
-import proof from "./sample_proof/pr_proof.json"
+import valid_proof from "./sample_proof/pr_proof.json"
 import { ethers } from "hardhat"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { config } from "../package.json"
+import { setupGateKeeper } from "./utils"
 
 describe("GateKeeper", () => {
-    let gateKeeper: GateKeeper
-    let prVerifier: PrVerifier
+    let gateKeeperContract: GateKeeper
+    let prVerifierContract: PrVerifier
     let semaphoreContract: Semaphore
     const users: Identity[] = []
 
@@ -23,20 +24,10 @@ describe("GateKeeper", () => {
     beforeEach(async () => {
         ;[user1, user2] = await ethers.getSigners()
 
-        const { semaphore } = await run("deploy:semaphore", {
-            logs: false
-        })
+        const { gateKeeper, prVerifier, semaphore } = await setupGateKeeper()
 
-        const Factory = await ethers.getContractFactory("PrVerifier")
-        prVerifier = await Factory.deploy()
-
-        const GateKeeperFactory = await ethers.getContractFactory("GateKeeper")
-        gateKeeper = await GateKeeperFactory.deploy(
-            semaphore.address,
-            prVerifier.address,
-            "0x0000000000000000000000006f614465766974616e2f796c646e656972666b7a",
-            "0x0000000000000000000000000000000000000000000000000000000000000000"
-        )
+        gateKeeperContract = gateKeeper
+        prVerifierContract = prVerifier
         semaphoreContract = semaphore
 
         users.push(
@@ -47,35 +38,35 @@ describe("GateKeeper", () => {
     })
 
     it("should have proper gate keeper settings", async () => {
-        expect(gateKeeper.address).to.be.properAddress
-        expect(await gateKeeper.semaphore()).to.be.properAddress
-        expect(await gateKeeper.semaphore()).to.equal(semaphoreContract.address)
+        expect(gateKeeperContract.address).to.be.properAddress
+        expect(await gateKeeperContract.semaphore()).to.be.properAddress
+        expect(await gateKeeperContract.semaphore()).to.equal(semaphoreContract.address)
     })
 
     describe("Contributors", () => {
         it("should be able to join with valid proof", async () => {
             //@ts-ignore
-            await gateKeeper.joinContributors(proof.calldata)
+            await gateKeeperContract.joinContributors(valid_proof.calldata)
         })
 
         it("should not be able to use one email more than once", async () => {
             //@ts-ignore
-            await gateKeeper.joinContributors(proof.calldata)
+            await gateKeeperContract.joinContributors(valid_proof.calldata)
 
             await expect(
                 //@ts-ignore
-                gateKeeper.joinContributors(proof.calldata)
-            ).to.be.revertedWithCustomError(gateKeeper, "EmailAlreadyRegistered")
+                gateKeeperContract.joinContributors(valid_proof.calldata)
+            ).to.be.revertedWithCustomError(gateKeeperContract, "EmailAlreadyRegistered")
         })
 
         describe("Signal Validation", () => {
             it("should validate contributor singal", async () => {
-                const gpId = await gateKeeper.CONTRIBUTORS_GROUP_ID()
+                const gpId = await gateKeeperContract.CONTRIBUTORS_GROUP_ID()
                 //@ts-ignore
                 const gp = new Group(gpId)
 
                 //@ts-ignore
-                await gateKeeper.joinContributors(proof.calldata)
+                await gateKeeperContract.joinContributors(valid_proof.calldata)
                 gp.addMember(users[0].commitment)
 
                 const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`
@@ -89,7 +80,7 @@ describe("GateKeeper", () => {
                 })
 
                 //@ts-ignore
-                await gateKeeper.validateContributorSignal([
+                await gateKeeperContract.validateContributorSignal([
                     signal,
                     scope,
                     proof.merkleTreeRoot,
@@ -99,12 +90,12 @@ describe("GateKeeper", () => {
             })
 
             it("should not allow invalid contributor singal", async () => {
-                const gpId = await gateKeeper.CONTRIBUTORS_GROUP_ID()
+                const gpId = await gateKeeperContract.CONTRIBUTORS_GROUP_ID()
                 //@ts-ignore
                 const gp = new Group(gpId)
 
                 //@ts-ignore
-                await gateKeeper.joinContributors(proof.calldata)
+                await gateKeeperContract.joinContributors(valid_proof.calldata)
                 gp.addMember(users[0].commitment)
 
                 const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`
@@ -119,23 +110,23 @@ describe("GateKeeper", () => {
 
                 await expect(
                     //@ts-ignore
-                    gateKeeper.validateContributorSignal([
+                    gateKeeperContract.validateContributorSignal([
                         formatBytes32String("invalid-signal"),
                         scope,
                         proof.merkleTreeRoot,
                         proof.nullifierHash,
                         proof.proof
                     ])
-                ).to.be.revertedWithCustomError(gateKeeper, "InvalidProof")
+                ).to.be.revertedWithCustomError(gateKeeperContract, "InvalidProof")
             })
 
             it("should not be able to validate a signal more than once", async () => {
-                const gpId = await gateKeeper.CONTRIBUTORS_GROUP_ID()
+                const gpId = await gateKeeperContract.CONTRIBUTORS_GROUP_ID()
                 //@ts-ignore
                 const gp = new Group(gpId)
 
                 //@ts-ignore
-                await gateKeeper.joinContributors(proof.calldata)
+                await gateKeeperContract.joinContributors(valid_proof.calldata)
                 gp.addMember(users[0].commitment)
 
                 const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`
@@ -149,7 +140,7 @@ describe("GateKeeper", () => {
                 })
 
                 //@ts-ignore
-                await gateKeeper.validateContributorSignal([
+                await gateKeeperContract.validateContributorSignal([
                     signal,
                     scope,
                     proof.merkleTreeRoot,
@@ -159,7 +150,7 @@ describe("GateKeeper", () => {
 
                 await expect(
                     //@ts-ignore
-                    gateKeeper.validateContributorSignal([
+                    gateKeeperContract.validateContributorSignal([
                         signal,
                         scope,
                         proof.merkleTreeRoot,
