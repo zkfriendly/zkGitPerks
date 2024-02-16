@@ -17,11 +17,9 @@ contract GateKeeper is IGateKeeperMeta {
 
     RepositoryName public repository;
     mapping(uint => bool) public emailNullifier;
-    // group id => commitment => isMember
-    mapping(uint => mapping(uint => bool)) public isMember;
 
-    uint public totalContributors;
-    uint public totalDonators;
+    // commitment => isMember
+    mapping(uint => bool) public isMember;
 
     constructor(address _semaphore, address _verifier, uint _repoNameChunk1, uint _repoNameChunk2) {
         semaphore = _semaphore;
@@ -42,16 +40,15 @@ contract GateKeeper is IGateKeeperMeta {
     // ================== VIEW FUNCTIONS ==================
 
     function isContributor(uint commitment) external view returns (bool) {
-        return isMember[CONTRIBUTORS_GROUP_ID][commitment];
+        return isMember[commitment];
     }
 
     // ================== MUTATING FUNCTIONS ==================
 
     function joinContributors(Proof calldata proof) external {
         uint commitment = _validateContributionProof(proof); // reverts if invalid
-        if (isMember[CONTRIBUTORS_GROUP_ID][commitment]) revert CommitmentExists();
-        isMember[CONTRIBUTORS_GROUP_ID][commitment] = true;
-        totalContributors++;
+        if (isMember[commitment]) revert CommitmentExists();
+        isMember[commitment] = true;
         ISemaphore(semaphore).addMember(CONTRIBUTORS_GROUP_ID, commitment);
     }
 
