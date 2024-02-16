@@ -7,6 +7,9 @@ async function deployPrVerifier() {
 
     console.info(`PrVerifier contract has been deployed to: ${prVerifier.address}`)
 
+    // wait 1 minute for the gatekeeper to be deployed
+    await new Promise((resolve) => setTimeout(resolve, 60000))
+
     // don't verify if network is hardhat
     if (network.name !== "hardhat") {
         await hre.run("verify:verify", {
