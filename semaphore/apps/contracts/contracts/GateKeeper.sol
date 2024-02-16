@@ -6,12 +6,16 @@ import "./interfaces/IGroth16Verifier.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IGateKeeperMeta.sol";
 
+import "hardhat/console.sol";
+
 contract GateKeeper is IGateKeeperMeta {
     using SafeERC20 for IERC20;
 
+    address public admin; // for debuging and testing purposes
+
     uint256 public immutable CONTRIBUTORS_GROUP_ID;
-    address public immutable semaphore;
-    address public immutable groth16verifier;
+    address public semaphore;
+    address public groth16verifier;
 
     RepositoryName public repository;
     mapping(uint => bool) public emailNullifier;
@@ -25,6 +29,8 @@ contract GateKeeper is IGateKeeperMeta {
         semaphore = _semaphore;
         groth16verifier = _verifier;
         repository = RepositoryName(_repoNameChunk1, _repoNameChunk2);
+
+        admin = msg.sender;
 
         // generate random group ids
         uint256 contributorGroupId = uint256(keccak256(abi.encodePacked(address(this), "CONTRIBUTOR")));
@@ -80,5 +86,27 @@ contract GateKeeper is IGateKeeperMeta {
         // todo: verify email sender
 
         return proof._pubSignals[0];
+    }
+
+    // ================== ADMIN FUNCTIONS ================== for testing and debugging
+
+    function setRepositoryName(uint _repoNameChunk1, uint _repoNameChunk2) external {
+        require(msg.sender == admin, "only admin");
+        repository = RepositoryName(_repoNameChunk1, _repoNameChunk2);
+    }
+
+    function setAdmin(address _admin) external {
+        require(msg.sender == admin, "only admin");
+        admin = _admin;
+    }
+
+    function setVerifier(address _verifier) external {
+        require(msg.sender == admin, "only admin");
+        groth16verifier = _verifier;
+    }
+
+    function setSemaphore(address _semaphore) external {
+        require(msg.sender == admin, "only admin");
+        semaphore = _semaphore;
     }
 }

@@ -29,16 +29,19 @@ async function deployGateKeeper(semaphoreAddress: string, prVerifierAddress: str
     ]
 
     //@ts-ignore
-    // const gateKeeper = await GateKeeperFactory.deploy(...args)
+    const gateKeeper = await GateKeeperFactory.deploy(...args)
 
-    // await gateKeeper.deployed()
+    await gateKeeper.deployed()
 
-    // console.info(`GateKeeper contract has been deployed to: ${gateKeeper.address}`)
+    console.info(`GateKeeper contract has been deployed to: ${gateKeeper.address}`)
+
+    // wait 1 minute for the gatekeeper to be deployed
+    await new Promise((resolve) => setTimeout(resolve, 60000))
 
     // don't verify if network is hardhat
     if (network.name !== "hardhat") {
         await hre.run("verify:verify", {
-            address: "0x5Ee0D4761627084A8DEd0f25C8D8199860B32791",
+            address: gateKeeper.address,
             constructorArguments: args
         })
     }
@@ -46,7 +49,7 @@ async function deployGateKeeper(semaphoreAddress: string, prVerifierAddress: str
 
 async function deploy() {
     // const prVerifier = await deployPrVerifier()
-    await deployGateKeeper("0x3889927F0B5Eb1a02C6E2C20b39a1Bd4EAd76131", "0x67514950B3ad14cC5bD91Af6641B84e1Acaf2820")
+    await deployGateKeeper("0x3889927F0B5Eb1a02C6E2C20b39a1Bd4EAd76131", "0x9Df93523d1F1961F0c4e493dd948432bAE7a4127")
 }
 
 deploy()
