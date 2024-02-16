@@ -6,7 +6,7 @@ import { formatBytes32String } from "ethers/lib/utils"
 import { run } from "hardhat"
 // @ts-ignore: typechain folder will be generated after contracts compilation
 import { GateKeeper, Semaphore, PrVerifier, IERC20__factory } from "../build/typechain"
-import valid_proof_1 from "./sample_proof/valid_proof_1.json"
+import proof from "./sample_proof/pr_proof.json"
 import { ethers } from "hardhat"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { config } from "../package.json"
@@ -55,16 +55,16 @@ describe("GateKeeper", () => {
     describe("Contributors", () => {
         it("should be able to join with valid proof", async () => {
             //@ts-ignore
-            await gateKeeper.joinContributors(valid_proof_1.calldata)
+            await gateKeeper.joinContributors(proof.calldata)
         })
 
         it("should not be able to use one email more than once", async () => {
             //@ts-ignore
-            await gateKeeper.joinContributors(valid_proof_1.calldata)
+            await gateKeeper.joinContributors(proof.calldata)
 
             await expect(
                 //@ts-ignore
-                gateKeeper.joinContributors(valid_proof_1.calldata)
+                gateKeeper.joinContributors(proof.calldata)
             ).to.be.revertedWithCustomError(gateKeeper, "EmailAlreadyRegistered")
         })
 
@@ -75,7 +75,7 @@ describe("GateKeeper", () => {
                 const gp = new Group(gpId)
 
                 //@ts-ignore
-                await gateKeeper.joinContributors(valid_proof_1.calldata)
+                await gateKeeper.joinContributors(proof.calldata)
                 gp.addMember(users[0].commitment)
 
                 const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`
@@ -104,7 +104,7 @@ describe("GateKeeper", () => {
                 const gp = new Group(gpId)
 
                 //@ts-ignore
-                await gateKeeper.joinContributors(valid_proof_1.calldata)
+                await gateKeeper.joinContributors(proof.calldata)
                 gp.addMember(users[0].commitment)
 
                 const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`
@@ -135,7 +135,7 @@ describe("GateKeeper", () => {
                 const gp = new Group(gpId)
 
                 //@ts-ignore
-                await gateKeeper.joinContributors(valid_proof_1.calldata)
+                await gateKeeper.joinContributors(proof.calldata)
                 gp.addMember(users[0].commitment)
 
                 const wasmFilePath = `${config.paths.build["snark-artifacts"]}/semaphore.wasm`
