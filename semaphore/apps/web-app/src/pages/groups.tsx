@@ -65,7 +65,6 @@ export default function GroupsPage() {
                 args: [processedProof]
             })
             setTxState(TransactionState.AWAITING_USER_APPROVAL)
-            // @ts-ignore
             const { hash } = await writeContract(request)
             setTxState(TransactionState.AWAITING_TRANSACTION)
             await waitForTransaction({
