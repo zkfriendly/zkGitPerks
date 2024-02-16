@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "@semaphore-protocol/contracts/interfaces/ISemaphore.sol";
-import "./interfaces/IGroth16Verifier.sol";
+import "./interfaces/IPrVerifier.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IGateKeeperMeta.sol";
 
@@ -70,7 +70,7 @@ contract GateKeeper is IGateKeeper {
     }
 
     function _validateContributionProof(Proof memory proof) internal returns (uint) {
-        if (!IGroth16Verifier(groth16verifier).verifyProof(proof._pA, proof._pB, proof._pC, proof._pubSignals))
+        if (!IPrVerifier(groth16verifier).verifyProof(proof._pA, proof._pB, proof._pC, proof._pubSignals))
             revert InvalidProof();
         if (emailNullifier[proof._pubSignals[1]]) revert EmailAlreadyRegistered();
         if (repository.chunk1 != proof._pubSignals[3] || repository.chunk2 != proof._pubSignals[4])
