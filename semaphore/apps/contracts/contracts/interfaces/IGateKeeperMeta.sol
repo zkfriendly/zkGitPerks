@@ -1,7 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-interface IGateKeeperMeta {
+interface IGateKeeper {
     struct RepositoryName {
         uint chunk1;
         uint chunk2;
@@ -21,8 +21,11 @@ interface IGateKeeperMeta {
         uint256 nullifierHash;
         uint256[8] proof;
     }
+
     error InvalidProof();
     error EmailAlreadyRegistered();
     error InvalidRepository();
     error CommitmentExists();
+
+    function validateContributorSignal(Signal calldata signal) external;
 }

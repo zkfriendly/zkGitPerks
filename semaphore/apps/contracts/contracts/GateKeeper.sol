@@ -6,7 +6,7 @@ import "./interfaces/IGroth16Verifier.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IGateKeeperMeta.sol";
 
-contract GateKeeper is IGateKeeperMeta {
+contract GateKeeper is IGateKeeper {
     using SafeERC20 for IERC20;
 
     address public admin; // for debuging and testing purposes
@@ -52,7 +52,7 @@ contract GateKeeper is IGateKeeperMeta {
         ISemaphore(semaphore).addMember(CONTRIBUTORS_GROUP_ID, commitment);
     }
 
-    function validateContributorSignal(Signal calldata signal) external {
+    function validateContributorSignal(Signal calldata signal) external override {
         _validateSignal(CONTRIBUTORS_GROUP_ID, signal);
     }
 
