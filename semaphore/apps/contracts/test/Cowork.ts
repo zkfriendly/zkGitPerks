@@ -1,5 +1,5 @@
 import { ethers } from "hardhat"
-import { Cowork, GateKeeper, IERC20__factory } from "../build/typechain"
+import { Cowork, CoworkVerifier, GateKeeper, IERC20__factory } from "../build/typechain"
 import { setupGateKeeper } from "./utils"
 import { expect } from "chai"
 import { MockContract, deployMockContract } from "ethereum-waffle"
@@ -15,6 +15,7 @@ import { config } from "../package.json"
 describe("Cowork", async () => {
     let coworkContract: Cowork
     let gateKeeperContract: GateKeeper
+    let coworkVerifier: CoworkVerifier
     let token: MockContract
     const ticketPrice: BigNumber = ethers.utils.parseEther("0.1")
     let signer: SignerWithAddress
@@ -36,9 +37,16 @@ describe("Cowork", async () => {
         const { gateKeeper } = await setupGateKeeper()
         gateKeeperContract = gateKeeper
         token = await deployMockContract(signer, IERC20__factory.abi)
+        const CoworkVerifierFactory = await ethers.getContractFactory("CoworkVerifier")
+        coworkVerifier = (await CoworkVerifierFactory.deploy()) as CoworkVerifier
 
         const CoworkFactory = await ethers.getContractFactory("Cowork")
-        coworkContract = await CoworkFactory.deploy(gateKeeperContract.address, token.address, ticketPrice)
+        coworkContract = await CoworkFactory.deploy(
+            gateKeeperContract.address,
+            token.address,
+            ticketPrice,
+            coworkVerifier.address
+        )
 
         const gpId = await gateKeeperContract.CONTRIBUTORS_GROUP_ID()
         //@ts-ignore

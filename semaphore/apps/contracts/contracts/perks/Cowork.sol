@@ -1,8 +1,7 @@
 //SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 import "../interfaces/IGateKeeperMeta.sol";
-
-import "hardhat/console.sol";
+import "../interfaces/ICoworkVerifier.sol";
 
 /// @title Devconnect Coworking Space ticket reimbursement contract
 /// @author zkfriendly
@@ -12,6 +11,7 @@ contract Cowork {
     address public gateKeeper;
     address public token; // reimbursement are paid in this token
     uint256 public ticketPrice; // price of the ticket in token
+    address public groth16verifier;
 
     struct GateKeeperProof {
         uint256 merkleTreeRoot;
@@ -26,10 +26,13 @@ contract Cowork {
         uint[3] _pubSignals;
     }
 
-    constructor(address _gateKeeper, address _token, uint256 _ticketPrice) {
+    error InvalidProof();
+
+    constructor(address _gateKeeper, address _token, uint256 _ticketPrice, address _verifier) {
         gateKeeper = _gateKeeper;
         token = _token;
         ticketPrice = _ticketPrice;
+        groth16verifier = _verifier;
     }
 
     function claim(GateKeeperProof calldata gateKeeperProof, Proof calldata proof) external {
@@ -42,6 +45,8 @@ contract Cowork {
                 gateKeeperProof.proof
             )
         );
+        if (!ICoworkVerifier(groth16verifier).verifyProof(proof._pA, proof._pB, proof._pC, proof._pubSignals))
+            revert InvalidProof();
     }
 
     function getScope() public view returns (uint256) {
