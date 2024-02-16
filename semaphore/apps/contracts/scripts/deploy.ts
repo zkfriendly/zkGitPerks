@@ -1,4 +1,5 @@
-import hre, { ethers, network } from "hardhat"
+import hre, { ethers, network, run } from "hardhat"
+
 async function deployPrVerifier() {
     const PrVerifierFactory = await ethers.getContractFactory("PrVerifier")
     const prVerifier = await PrVerifierFactory.deploy()
@@ -52,7 +53,7 @@ async function deployGateKeeper(semaphoreAddress: string, prVerifierAddress: str
 
 async function deploy() {
     // const prVerifier = await deployPrVerifier()
-    await deployGateKeeper("0x3889927F0B5Eb1a02C6E2C20b39a1Bd4EAd76131", "0x9Df93523d1F1961F0c4e493dd948432bAE7a4127")
+    await deployGateKeeper("0xf4C4821434c0B54Dd0c45953A8fF38f6D15c2166", "0x2D6f61a7D4Fc62169327B7B58F59Bf21c1CFd037")
 }
 
 deploy()
