@@ -7,7 +7,6 @@ import { run } from "hardhat"
 // @ts-ignore: typechain folder will be generated after contracts compilation
 import { Feedback, GateKeeper, Semaphore, PrVerifier, IERC20__factory } from "../build/typechain"
 import valid_proof_1 from "./sample_proof/valid_proof_1.json"
-import valid_proof_2 from "./sample_proof/valid_proof_2.json"
 import { ethers } from "hardhat"
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { config } from "../package.json"
