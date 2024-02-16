@@ -72,15 +72,11 @@ contract GateKeeper is IGateKeeperMeta {
     function _validateContributionProof(Proof memory proof) internal returns (uint) {
         if (!IGroth16Verifier(groth16verifier).verifyProof(proof._pA, proof._pB, proof._pC, proof._pubSignals))
             revert InvalidProof();
-
-        // if (emailNullifier[proof._pubSignals[1]]) revert EmailAlreadyRegistered(); // only for debugging convenience
-
+        if (emailNullifier[proof._pubSignals[1]]) revert EmailAlreadyRegistered();
         if (repository.chunk1 != proof._pubSignals[3] || repository.chunk2 != proof._pubSignals[4])
             revert InvalidRepository();
-
         emailNullifier[proof._pubSignals[1]] = true;
         // todo: verify email sender
-
         return proof._pubSignals[0];
     }
 
