@@ -91,12 +91,22 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
 
     const processedProof = useMemo(() => {
         const rawProof = generatedProof?.proof
-        if (!rawProof) return undefined
-        const pA = rawProof.pi_a.slice(0, 2)
-        const pB = rawProof.pi_b.slice(0, 2)
-        const pC = rawProof.pi_c.slice(0, 2)
-        const publicSignals = generatedProof.public
-        return [pA, pB, pC, publicSignals]
+        const _pubSignals = generatedProof?.public?.map((x) => BigInt(x)) as
+            | [bigint, bigint, bigint, bigint, bigint]
+            | undefined
+        if (!rawProof || !_pubSignals) return undefined
+        const _pA = rawProof.pi_a.slice(0, 2).map((x) => BigInt(x)) as [bigint, bigint]
+        const _pB = rawProof.pi_b.slice(0, 2).map((x) => x.map((y) => BigInt(y))) as [
+            [bigint, bigint],
+            [bigint, bigint]
+        ]
+        const _pC = rawProof.pi_c.slice(0, 2).map((x) => BigInt(x)) as [bigint, bigint]
+        return {
+            _pA,
+            _pB,
+            _pC,
+            _pubSignals
+        }
     }, [generatedProof])
 
     return {

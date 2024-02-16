@@ -61,7 +61,6 @@ export default function GroupsPage() {
                 address: gateKeeperAddress,
                 abi: gateKeeperABI,
                 functionName: "joinContributors",
-                // @ts-ignore
                 args: [processedProof]
             })
             setTxState(TransactionState.AWAITING_USER_APPROVAL)
