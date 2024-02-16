@@ -1,7 +1,8 @@
 pragma circom 2.1.5;
 
 include "@zk-email/circuits/email-verifier.circom";
-include "./cowork_ticket_regex.circom";
+include "./cowork_payment_regex.circom";
+include "./cowork_from_regex.circom";
 include "circomlib/circuits/poseidon.circom";
 
 
@@ -29,10 +30,17 @@ template CoworkTicketVerifier(max_header_bytes, n, k, pack_size, max_repo_name_l
     
     // pubkey_hash <== EV.pubkey_hash;    
 
-    component R = CoworkTicketRegex(max_header_bytes);
+    component F = FromRegex(max_header_bytes);
+    F.msg <== in_padded;
+    log(F.out);
+    F.out === 1;
+
+    component R = PaymentRegex(max_header_bytes);
     R.msg <== in_padded;
     log(R.out);
     R.out === 1;
+
+    
 
     // expose signature hash
    var k2_chunked_size = k >> 1;
