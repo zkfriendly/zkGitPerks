@@ -6,8 +6,6 @@ import "./interfaces/IGroth16Verifier.sol";
 import "./interfaces/IERC20.sol";
 import "./interfaces/IGateKeeperMeta.sol";
 
-import "hardhat/console.sol";
-
 contract GateKeeper is IGateKeeperMeta {
     using SafeERC20 for IERC20;
 
@@ -32,7 +30,7 @@ contract GateKeeper is IGateKeeperMeta {
 
         admin = msg.sender;
 
-        // generate random group ids
+        // generate random group id
         uint256 contributorGroupId = uint256(keccak256(abi.encodePacked(address(this), "CONTRIBUTOR")));
 
         CONTRIBUTORS_GROUP_ID = contributorGroupId;
