@@ -42,7 +42,7 @@ export function ZkEmail({ identity, circuitId, getProofInputs, onProofGenerated 
                 headers
             })
             .then((res) => {
-                setLogs(`Proof is being generated... 🤖 this could take a few minuts. proof id: ${res.data.proof_id}`)
+                setLogs(`Proof is being generated... 🤖 this could take a few minuts.`)
 
                 const interval = setInterval(() => {
                     axios

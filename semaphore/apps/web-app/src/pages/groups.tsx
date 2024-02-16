@@ -96,9 +96,16 @@ export default function GroupsPage() {
         setTxState(TransactionState.INITIAL)
     }, [txState])
 
-    const onProofGenerated = async (proof: any) => {
-        console.log("We got the proof")
-        console.log(proof)
+    const onProofGenerated = async (proofResponse: any) => {
+        const rawProof = proofResponse.proof
+        const pA = rawProof.pi_a.slice(0, 2)
+        const pB = rawProof.pi_b.slice(0, 2)
+        const pC = rawProof.pi_c.slice(0, 2)
+        const publicSignals = proofResponse.public
+
+        const args = [pA, pB, pC, publicSignals]
+        console.log(args)
+        return args
     }
 
     return (
