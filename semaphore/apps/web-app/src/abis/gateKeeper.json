@@ -59,6 +59,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "admin",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "uint256",
@@ -197,6 +210,63 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_admin",
+                "type": "address"
+            }
+        ],
+        "name": "setAdmin",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_repoNameChunk1",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_repoNameChunk2",
+                "type": "uint256"
+            }
+        ],
+        "name": "setRepositoryName",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_semaphore",
+                "type": "address"
+            }
+        ],
+        "name": "setSemaphore",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_verifier",
+                "type": "address"
+            }
+        ],
+        "name": "setVerifier",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {

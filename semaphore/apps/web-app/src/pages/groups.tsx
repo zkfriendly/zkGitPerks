@@ -1,54 +1,30 @@
-import { Button, Divider, Heading, Highlight, HStack, Stack, Text, useBoolean, VStack } from "@chakra-ui/react"
+import { Button, Divider, Heading, Highlight, HStack, Stack, Text, VStack } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
-import { useCallback, useContext, useEffect, useMemo, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { prepareWriteContract, waitForTransaction, writeContract } from "@wagmi/core"
+import AppButton from "../components/AppButton"
 import { useContractAddress } from "../hooks/useContractAddress"
 import { GATEKEEPER_CONTRACT_ADDRESS_MAP } from "../constants/addresses"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
 import IconRefreshLine from "../icons/IconRefreshLine"
-import { ZkEmail } from "../components/ZkEmail"
 import { getPrProofInputs } from "../lib/input"
 import { PR_CIRCUIT_ID } from "../constants"
-import { gateKeeperABI, useGateKeeperRepository } from "../abis/types/generated"
-import { TransactionState } from "../types"
+import { gateKeeperABI } from "../abis/types/generated"
+import { TransactionState, ZkProofStatus } from "../types"
+import useZkEmail from "../hooks/useZkEmail"
+import EmailInput from "../components/EmailInput"
+import useRepositoryName from "../hooks/useRepositoryName"
 
 export default function GroupsPage() {
     const navigate = useNavigate()
     const { setLogs } = useContext(LogsContext)
-    const { _users, refreshUsers, addUser } = useContext(SemaphoreContext)
-    const [_loading, setLoading] = useBoolean()
+    const { _users, refreshUsers } = useContext(SemaphoreContext)
     const [_identity, setIdentity] = useState<Identity>()
-    const [emailFull, setEmailFull] = useState<string>("")
     const gateKeeperAddress = useContractAddress(GATEKEEPER_CONTRACT_ADDRESS_MAP)
-
-    const { data: repositoryNameChunks } = useGateKeeperRepository({
-        address: gateKeeperAddress
-    })
-
-    const repositoryName = useMemo(() => {
-        if (!repositoryNameChunks) return undefined
-        let name = ""
-        repositoryNameChunks.forEach((nameChunk) => {
-            let chunk = BigInt(nameChunk)
-            const buffer = new ArrayBuffer(256)
-            const dataView = new DataView(buffer)
-
-            for (let i = 0; i < 256; i++) {
-                dataView.setUint8(i, Number(chunk & BigInt(0xff)))
-                chunk >>= BigInt(8)
-            }
-
-            const uint8Array = new Uint8Array(buffer)
-            const decoder = new TextDecoder()
-            const text = decoder.decode(uint8Array)
-            name += text.indexOf("\0") !== -1 ? text.slice(0, text.indexOf("\0")) : text
-        })
-        return name
-    }, [repositoryNameChunks])
-
+    const repositoryName = useRepositoryName()
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
 
@@ -68,21 +44,27 @@ export default function GroupsPage() {
 
     const userHasJoined = useCallback((identity: Identity) => _users.includes(identity.commitment.toString()), [_users])
 
+    const [emailFull, setEmailFull] = useState("")
+
+    const { generateProof, processedProof, status } = useZkEmail({
+        circuitId: PR_CIRCUIT_ID,
+        getProofInputs: getPrProofInputs,
+        identity: _identity!
+    })
+
     const [txState, setTxState] = useState(TransactionState.INITIAL)
     const joinContributors = useCallback(async () => {
-        if (txState !== TransactionState.INITIAL) return
+        if (txState !== TransactionState.INITIAL || !gateKeeperAddress || !processedProof) return
         try {
             setTxState(TransactionState.PREPARING_TRANSACTION)
             const { request } = await prepareWriteContract({
                 address: gateKeeperAddress,
                 abi: gateKeeperABI,
                 functionName: "joinContributors",
-                // TODO: pass the arguments
                 // @ts-ignore
-                args: []
+                args: [processedProof]
             })
             setTxState(TransactionState.AWAITING_USER_APPROVAL)
-            // TODO: remove this ts-ignore after passing args to request
             // @ts-ignore
             const { hash } = await writeContract(request)
             setTxState(TransactionState.AWAITING_TRANSACTION)
@@ -91,22 +73,11 @@ export default function GroupsPage() {
             })
             alert("transaction completed!")
         } catch (e) {
+            console.log(e)
             alert(`Error: ${String(e)}`)
         }
         setTxState(TransactionState.INITIAL)
-    }, [txState])
-
-    const onProofGenerated = async (proofResponse: any) => {
-        const rawProof = proofResponse.proof
-        const pA = rawProof.pi_a.slice(0, 2)
-        const pB = rawProof.pi_b.slice(0, 2)
-        const pC = rawProof.pi_c.slice(0, 2)
-        const publicSignals = proofResponse.public
-
-        const args = [pA, pB, pC, publicSignals]
-        console.log(args)
-        return args
-    }
+    }, [txState, gateKeeperAddress, processedProof])
 
     return (
         <>
@@ -141,12 +112,20 @@ export default function GroupsPage() {
                     Refresh
                 </Button>
             </HStack>
-            <ZkEmail
-                onProofGenerated={onProofGenerated}
-                circuitId={PR_CIRCUIT_ID}
-                getProofInputs={getPrProofInputs}
-                identity={_identity!}
-            />
+            <EmailInput emailFull={emailFull} setEmailFull={setEmailFull} />
+            <AppButton
+                onClick={() => {
+                    if (processedProof) {
+                        if (txState === TransactionState.INITIAL) {
+                            joinContributors()
+                        }
+                    } else if (status === ZkProofStatus.INITIAL) {
+                        generateProof(emailFull)
+                    }
+                }}
+            >
+                Generate zk proof
+            </AppButton>
             {_users.length > 0 && (
                 <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
                     {_users.map((user, i) => (
