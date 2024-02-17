@@ -6,9 +6,11 @@
   <component name="ChangeListManager">
     <list default="true" id="d2ebf95c-5b54-4733-b20a-1ef9250ddd08" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/App.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/components/DragAndDropTextBox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/components/DragAndDropTextBox.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/components/EmailInput.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/components/EmailInput.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/groups.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/groups.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/index.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,12 +62,14 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "git-widget-placeholder": "develop",
-    "last_opened_file_path": "C:/Users/amire/Work/coreDevsDao/semaphore/apps/web-app",
+    "last_opened_file_path": "C:/Users/amire/Work/coreDevsDao/semaphore",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "yarn",
+    "prettierjs.PrettierConfiguration.Package": "C:\\Users\\amire\\Work\\coreDevsDao\\semaphore\\node_modules\\prettier",
+    "settings.editor.selected.configurable": "settings.javascript.prettier",
     "ts.external.directory.path": "C:\\Users\\amire\\Work\\coreDevsDao\\semaphore\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
@@ -85,7 +89,7 @@
       <updated>1708124369674</updated>
       <workItem from="1708124370766" duration="151000" />
       <workItem from="1708170380229" duration="3302000" />
-      <workItem from="1708209024422" duration="2155000" />
+      <workItem from="1708209024422" duration="3982000" />
     </task>
     <servers />
   </component>

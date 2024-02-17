@@ -3,10 +3,16 @@ import { Identity } from "@semaphore-protocol/identity"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useAccount, useSignMessage } from "wagmi"
+import styled from "styled-components"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
 import useRepositoryName from "../hooks/useRepositoryName"
+
+export const PageBodyContainer = styled.div`
+    height: 65vh;
+    overflow-y: auto;
+`
 
 export default function IdentitiesPage() {
     const navigate = useNavigate()
@@ -47,69 +53,81 @@ export default function IdentitiesPage() {
 
     return (
         <>
-            <Heading as="h2" size="xl">
+            <Heading as="h2" size="xl" mb={3}>
                 Welcome to Git Perks! 🎉
             </Heading>
 
-            <Text color="primary.900" fontSize="lg">
-                Join the{" "}
-                {repositoryName && (
-                    <a
-                        href={`https://github.com/${repositoryName}`}
-                        target="_blank"
-                        style={{ fontWeight: "bold", fontSize: "1.2em" }}
+            <PageBodyContainer>
+                <Text color="primary.900" lineHeight="2rem" fontSize="lg">
+                    Join the{" "}
+                    {repositoryName && (
+                        <a
+                            href={`https://github.com/${repositoryName}`}
+                            target="_blank"
+                            style={{ fontWeight: "bold", fontSize: "1.2em" }}
+                        >
+                            {repositoryName}
+                        </a>
+                    )}{" "}
+                    contributors club to enjoy all the available perks and benefits. You can{" "}
+                    <Highlight
+                        query={["anonymously"]}
+                        styles={{
+                            fontSize: "14px",
+                            px: "2",
+                            py: "1",
+                            rounded: "full",
+                            bg: "teal.100",
+                            fontWeight: "bold"
+                        }}
                     >
-                        {repositoryName}
-                    </a>
-                )}{" "}
-                contributors club to enjoy all the available perks and benefits. You can{" "}
-                <Highlight query={["anonymously"]} styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}>
-                    anonymously
-                </Highlight>{" "}
-                claim reimbursements on event tickets, travel expenses, and much more. 💰
-            </Text>
-
-            <Divider pt="5" borderColor="gray.500" />
-
-            <Stack pt="5" justify="space-between">
-                <Text fontSize="lg" color="primary">
-                    Let's get you started by creating your Semaphore identity. This will allow you to join the
-                    contributors club and later claim your perks anonymously. 🕵🏽‍♂️
+                        anonymously
+                    </Highlight>{" "}
+                    claim reimbursements on event tickets, travel expenses, and much more. 💰
                 </Text>
-                <Text fontWeight="bold" fontSize="lg">
-                    Identity Generated Based on Your Wallet
-                </Text>
-            </Stack>
 
-            {_identity ? (
-                <Box py="6" whiteSpace="nowrap">
-                    <Box p="5" borderWidth={1} borderColor="gray.500" borderRadius="4px">
-                        <Text textOverflow="ellipsis" overflow="hidden">
-                            Trapdoor: {_identity.trapdoor.toString()}
-                        </Text>
-                        <Text textOverflow="ellipsis" overflow="hidden">
-                            Nullifier: {_identity.nullifier.toString()}
-                        </Text>
-                        <Text textOverflow="ellipsis" overflow="hidden">
-                            Commitment: {_identity.commitment.toString()}
-                        </Text>
+                <Divider pt="5" borderColor="gray.500" />
+
+                <Stack pt="5" justify="space-between">
+                    <Text fontSize="lg" color="primary">
+                        Let's get you started by creating your Semaphore identity. This will allow you to join the
+                        contributors club and later claim your perks anonymously. 🕵🏽‍♂️
+                    </Text>
+                    <Text fontWeight="bold" fontSize="lg">
+                        Identity Generated Based on Your Wallet
+                    </Text>
+                </Stack>
+
+                {_identity ? (
+                    <Box py="6" whiteSpace="nowrap">
+                        <Box p="5" borderWidth={1} borderColor="gray.500" borderRadius="4px">
+                            <Text textOverflow="ellipsis" overflow="hidden">
+                                Trapdoor: {_identity.trapdoor.toString()}
+                            </Text>
+                            <Text textOverflow="ellipsis" overflow="hidden">
+                                Nullifier: {_identity.nullifier.toString()}
+                            </Text>
+                            <Text textOverflow="ellipsis" overflow="hidden">
+                                Commitment: {_identity.commitment.toString()}
+                            </Text>
+                        </Box>
                     </Box>
-                </Box>
-            ) : (
-                <Box py="6">
-                    <Button
-                        w="100%"
-                        fontWeight="bold"
-                        justifyContent="left"
-                        px="4"
-                        disabled={!active}
-                        onClick={createIdentity}
-                        leftIcon={<IconAddCircleFill />}
-                    >
-                        {active ? "Create identity" : "Connect Metamask"}
-                    </Button>
-                </Box>
-            )}
+                ) : (
+                    <Box py="6">
+                        <Button
+                            w="100%"
+                            fontWeight="bold"
+                            justifyContent="left"
+                            px="4"
+                            disabled={!active}
+                            onClick={createIdentity}
+                            leftIcon={<IconAddCircleFill />}
+                        >
+                            {active ? "Create identity" : "Connect Metamask"}
+                        </Button>
+                    </Box>
+                )}
+            </PageBodyContainer>
 
             <Divider pt="3" borderColor="gray" />
 

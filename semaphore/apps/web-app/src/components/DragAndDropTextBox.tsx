@@ -11,6 +11,7 @@ const DragAndDropTextBoxWrapper = styled.div`
     flex-direction: column;
     align-items: center;
     border: 2px dashed #ccc;
+    border-radius: 6px;
     padding: 20px;
 `
 

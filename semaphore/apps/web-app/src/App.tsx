@@ -34,7 +34,7 @@ function ColorMode() {
     const {colorMode, toggleColorMode} = useColorMode()
     return (
         <header>
-            <Button onClick={toggleColorMode}>Toggle {colorMode === "light" ? "Dark" : "Light"}</Button>
+            <Button borderRadius='12px' fontSize='15px' padding='20px' onClick={toggleColorMode}>Toggle {colorMode === "light" ? "Dark" : "Light"}</Button>
         </header>
     )
 }
@@ -56,7 +56,7 @@ export default function App() {
                     <ColorMode/>
                 </HStack>
 
-                <Container maxW="800" flex="1" display="flex" alignItems="center">
+                <Container maxW="800" flex="1" display="flex" paddingTop='2rem'>
                     <Stack py="8" display="flex" width="100%">
                         <SemaphoreContext.Provider value={semaphore}>
                             <LogsContext.Provider
