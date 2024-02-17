@@ -1,5 +1,5 @@
 import { Route, Routes, useLocation } from "react-router-dom"
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { ChakraProvider, Container, HStack, Spinner, Stack, Text } from "@chakra-ui/react"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import useSemaphore from "./hooks/useSemaphore"
@@ -9,17 +9,19 @@ import theme from "./styles/index"
 import IdentitiesPage from "./pages"
 import ProofsPage from "./pages/proofs"
 import GroupsPage from "./pages/groups"
-import { GROUP_ID } from "./constants"
+import { useContractAddress } from "./hooks/useContractAddress"
+import { GATEKEEPER_CONTRACT_ADDRESS_MAP } from "./constants/addresses"
+import { useGateKeeperContributorsGroupId } from "./abis/types/generated"
 
 export default function App() {
     const location = useLocation()
-    const semaphore = useSemaphore({ groupId: GROUP_ID })
-    const [_logs, setLogs] = useState<string>("")
+    const gateKeeperAddress = useContractAddress(GATEKEEPER_CONTRACT_ADDRESS_MAP)
 
-    useEffect(() => {
-        semaphore.refreshUsers()
-        semaphore.refreshFeedback()
-    }, [])
+    const { data: groupId } = useGateKeeperContributorsGroupId({
+        address: gateKeeperAddress
+    })
+    const semaphore = useSemaphore({ groupId })
+    const [_logs, setLogs] = useState<string>("")
 
     return (
         <ChakraProvider theme={theme}>

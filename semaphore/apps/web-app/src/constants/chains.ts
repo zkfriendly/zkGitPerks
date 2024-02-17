@@ -1,6 +1,6 @@
-import { sepolia } from "wagmi/chains"
+import { scrollSepolia } from "wagmi/chains"
 
-export const chains = [sepolia]
+export const chains = [scrollSepolia]
 
 export function isSupportedChain(chainId: number | null | undefined) {
     // return !!chainId && !!SupportedChainId[chainId];

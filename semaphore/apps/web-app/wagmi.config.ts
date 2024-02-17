@@ -3,6 +3,7 @@ import { react } from "@wagmi/cli/plugins"
 import { Abi } from "viem"
 
 import GateKeeperABI from "./src/abis/gateKeeper.json"
+import ZkBillABI from "./src/abis/zkBill.json"
 
 export default defineConfig({
     out: "src/abis/types/generated.ts",
@@ -10,6 +11,10 @@ export default defineConfig({
         {
             name: "GateKeeper",
             abi: GateKeeperABI as Abi
+        },
+        {
+            name: "ZkBill",
+            abi: ZkBillABI as Abi
         }
     ],
     plugins: [react()]

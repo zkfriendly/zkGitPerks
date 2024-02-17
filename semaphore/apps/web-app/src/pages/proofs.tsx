@@ -5,13 +5,15 @@ import { generateProof } from "@semaphore-protocol/proof"
 import { BigNumber, utils } from "ethers"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { GROUP_ID } from "../constants"
 import Feedback from "../../contract-artifacts/Feedback.json"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
 import IconRefreshLine from "../icons/IconRefreshLine"
+import { useContractAddress } from "../hooks/useContractAddress"
+import { GATEKEEPER_CONTRACT_ADDRESS_MAP } from "../constants/addresses"
+import { useGateKeeperContributorsGroupId } from "../abis/types/generated"
 
 export default function ProofsPage() {
     const navigate = useNavigate()
@@ -19,7 +21,11 @@ export default function ProofsPage() {
     const { _users, _feedback, refreshFeedback, addFeedback } = useContext(SemaphoreContext)
     const [_loading, setLoading] = useBoolean()
     const [_identity, setIdentity] = useState<Identity>()
+    const gateKeeperAddress = useContractAddress(GATEKEEPER_CONTRACT_ADDRESS_MAP)
 
+    const { data: groupId } = useGateKeeperContributorsGroupId({
+        address: gateKeeperAddress
+    })
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
 
@@ -38,7 +44,7 @@ export default function ProofsPage() {
     }, [_feedback])
 
     const sendFeedback = useCallback(async () => {
-        if (!_identity) {
+        if (!_identity || !groupId) {
             return
         }
 
@@ -50,11 +56,16 @@ export default function ProofsPage() {
             setLogs(`Posting your anonymous feedback...`)
 
             try {
-                const group = new Group(GROUP_ID, 20, _users)
+                const group = new Group(groupId.toString(), 20, _users)
 
                 const signal = BigNumber.from(utils.formatBytes32String(feedback)).toString()
 
-                const { proof, merkleTreeRoot, nullifierHash } = await generateProof(_identity, group, GROUP_ID, signal)
+                const { proof, merkleTreeRoot, nullifierHash } = await generateProof(
+                    _identity,
+                    group,
+                    groupId.toString(),
+                    signal
+                )
 
                 let response: any
 

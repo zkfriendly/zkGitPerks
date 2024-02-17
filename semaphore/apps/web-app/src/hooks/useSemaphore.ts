@@ -1,46 +1,35 @@
-import { SemaphoreEthers } from "@semaphore-protocol/data"
-import { BigNumber, utils } from "ethers"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
+import { SemaphoreSubgraph } from "@semaphore-protocol/data"
 import { SemaphoreContextType } from "../context/SemaphoreContext"
-import { useContractAddress } from "./useContractAddress"
-import { SEMAPHORE_CONTRACT_ADDRESS_MAP } from "../constants/addresses"
 
-const ethereumNetwork =
-    // @ts-ignore
-    import.meta.env.VITE_DEFAULT_NETWORK === "localhost"
-        ? "http://localhost:8545"
-        : // @ts-ignore
-          import.meta.env.VITE_DEFAULT_NETWORK
-
-export default function useSemaphore({ groupId }: { groupId: string }): SemaphoreContextType {
-    const semaphoreAddress = useContractAddress(SEMAPHORE_CONTRACT_ADDRESS_MAP)
-    const [_users, setUsers] = useState<any[]>([])
+export default function useSemaphore({ groupId }: { groupId: bigint | undefined }): SemaphoreContextType {
+    const [_users, setUsers] = useState<string[] | null>(null)
     const [_feedback, setFeedback] = useState<string[]>([])
 
     const refreshUsers = useCallback(async (): Promise<void> => {
-        const semaphore = new SemaphoreEthers(ethereumNetwork, {
-            address: semaphoreAddress
-        })
-        const members = await semaphore.getGroupMembers(groupId)
-        setUsers(members)
+        if (!groupId) return
+        const semaphore = new SemaphoreSubgraph("https://api.studio.thegraph.com/query/65978/semaphore/version/latest")
+        const gp = await semaphore.getGroup(groupId.toString(), { members: true })
+        console.log({ gp })
+
+        if (gp?.members) {
+            setUsers(gp.members)
+        }
+    }, [groupId])
+
+    const addUser = useCallback((user: string) => {
+        setUsers((prevValue) => (prevValue ? [...prevValue, user] : [user]))
     }, [])
 
-    const addUser = useCallback(
-        (user: any) => {
-            setUsers([..._users, user])
-        },
-        [_users]
-    )
-
     const refreshFeedback = useCallback(async (): Promise<void> => {
-        const semaphore = new SemaphoreEthers(ethereumNetwork, {
-            // @ts-ignore
-            address: semaphoreAddress
-        })
-
-        const proofs = await semaphore.getGroupVerifiedProofs(groupId)
-
-        setFeedback(proofs.map(({ signal }: any) => utils.parseBytes32String(BigNumber.from(signal).toHexString())))
+        // const semaphore = new SemaphoreSubgraph(ethereumNetwork, {
+        //     // @ts-ignore
+        //     address: semaphoreAddress
+        // })
+        //
+        // const proofs = await semaphore.getGroupVerifiedProofs(groupId)
+        //
+        // setFeedback(proofs.map(({ signal }: any) => utils.parseBytes32String(BigNumber.from(signal).toHexString())))
     }, [])
 
     const addFeedback = useCallback(
@@ -49,6 +38,10 @@ export default function useSemaphore({ groupId }: { groupId: string }): Semaphor
         },
         [_feedback]
     )
+
+    useEffect(() => {
+        refreshUsers()
+    }, [refreshUsers])
 
     return {
         _users,

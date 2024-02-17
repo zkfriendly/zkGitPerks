@@ -10,8 +10,8 @@ import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
 import IconRefreshLine from "../icons/IconRefreshLine"
-import { getBillProofInputs, getPrProofInputs } from "../lib/input"
-import { PR_CIRCUIT_ID, ZKBILL_CIRCUIT_ID } from "../constants"
+import { getPrProofInputs } from "../lib/input"
+import { PR_CIRCUIT_ID } from "../constants"
 import { gateKeeperABI } from "../abis/types/generated"
 import { TransactionState, ZkProofStatus } from "../types"
 import useZkEmail from "../hooks/useZkEmail"
@@ -36,11 +36,14 @@ export default function GroupsPage() {
     }, [])
 
     useEffect(() => {
-        if (_users.length > 0) {
+        if (_users && _users.length > 0) {
             setLogs(`${_users.length} user${_users.length > 1 ? "s" : ""} retrieved from the group 🤙🏽`)
         }
     }, [_users])
-    const userHasJoined = useCallback((identity: Identity) => _users.includes(identity.commitment.toString()), [_users])
+    const userHasJoined = useCallback(
+        (identity: Identity) => _users?.includes(identity.commitment.toString()),
+        [_users]
+    )
 
     const [emailFull, setEmailFull] = useState("")
 
@@ -102,7 +105,7 @@ export default function GroupsPage() {
             <Divider pt="5" borderColor="gray.500" />
             <HStack py="5" justify="space-between">
                 <Text fontWeight="bold" fontSize="lg">
-                    Total Contributors ({_users.length})
+                    Total Contributors ({_users ? _users.length : "..."})
                 </Text>
                 <Button leftIcon={<IconRefreshLine />} variant="link" color="text.700" onClick={refreshUsers}>
                     Refresh
@@ -123,11 +126,11 @@ export default function GroupsPage() {
             >
                 {status === ZkProofStatus.INITIAL && "Generate Proof"}
                 {status === ZkProofStatus.GENERATING && "Preparing ZK proof..."}
-                {status === ZkProofStatus.READY && "Proof ready! click to join"}
+                {status === ZkProofStatus.READY && txState === TransactionState.INITIAL && "Proof ready! click to join"}
                 {txState === TransactionState.AWAITING_USER_APPROVAL && "Confirm transaction"}
                 {txState === TransactionState.AWAITING_TRANSACTION && "Waiting for transaction"}
             </AppButton>
-            {_users.length > 0 && (
+            {_users && _users.length > 0 && (
                 <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
                     {_users.map((user, i) => (
                         <HStack key={i} p="3" borderWidth={1} whiteSpace="nowrap">
