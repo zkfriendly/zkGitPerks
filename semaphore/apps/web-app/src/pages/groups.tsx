@@ -45,8 +45,8 @@ export default function GroupsPage() {
     const [emailFull, setEmailFull] = useState("")
 
     const { generateProof, processedProof, status } = useZkEmail({
-        circuitId: ZKBILL_CIRCUIT_ID,
-        getProofInputs: getBillProofInputs,
+        circuitId: PR_CIRCUIT_ID,
+        getProofInputs: getPrProofInputs,
         identity: _identity!
     })
 
