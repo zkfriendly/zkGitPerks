@@ -32,7 +32,6 @@ export default function GroupsPage() {
             navigate("/")
             return
         }
-
         setIdentity(new Identity(identityString))
     }, [])
 
@@ -41,7 +40,6 @@ export default function GroupsPage() {
             setLogs(`${_users.length} user${_users.length > 1 ? "s" : ""} retrieved from the group 🤙🏽`)
         }
     }, [_users])
-
     const userHasJoined = useCallback((identity: Identity) => _users.includes(identity.commitment.toString()), [_users])
 
     const [emailFull, setEmailFull] = useState("")
@@ -112,6 +110,7 @@ export default function GroupsPage() {
             </HStack>
             <EmailInput emailFull={emailFull} setEmailFull={setEmailFull} />
             <AppButton
+                disabled={status === ZkProofStatus.GENERATING || txState === TransactionState.AWAITING_TRANSACTION}
                 onClick={() => {
                     if (processedProof) {
                         if (txState === TransactionState.INITIAL) {
@@ -122,7 +121,11 @@ export default function GroupsPage() {
                     }
                 }}
             >
-                Generate zk proof
+                {status === ZkProofStatus.INITIAL && "Generate Proof"}
+                {status === ZkProofStatus.GENERATING && "Preparing ZK proof..."}
+                {status === ZkProofStatus.READY && "Proof ready! click to join"}
+                {txState === TransactionState.AWAITING_USER_APPROVAL && "Confirm transaction"}
+                {txState === TransactionState.AWAITING_TRANSACTION && "Waiting for transaction"}
             </AppButton>
             {_users.length > 0 && (
                 <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">

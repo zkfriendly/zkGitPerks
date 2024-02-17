@@ -14,7 +14,7 @@ export enum TransactionState {
 export enum ZkProofStatus {
     INITIAL,
     GENERATING,
-    VERIFYING
+    READY
 }
 
 export type ProofObject = {

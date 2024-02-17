@@ -73,11 +73,11 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
                             console.log(verifyRes.data)
                             setLogs(`Proof is ready! 🎉`)
                             setGeneratedProof(verifyRes.data)
+                            setStatus(ZkProofStatus.READY)
                         } else if (verifyRes.data.status === "Failed") {
                             setLogs(`Proof generation failed. 😭`)
                         }
                         if (interval) clearInterval(interval)
-                        setStatus(ZkProofStatus.VERIFYING)
                     })
                     .catch((err) => {
                         setLogs(`Error generating proof: ${err}`)
