@@ -1,25 +1,14 @@
 import hre, { ethers, network, run } from "hardhat"
 
-async function deployPrVerifier() {
-    const PrVerifierFactory = await ethers.getContractFactory("PrVerifier")
-    const prVerifier = await PrVerifierFactory.deploy()
+const gateKeeperAddress = "0x267ce9b841cE44e96f46D840A19850af480A81E3"
+const tokenAddress = "0x7984E363c38b590bB4CA35aEd5133Ef2c6619C40"
 
-    await prVerifier.deployed()
-
-    console.info(`PrVerifier contract has been deployed to: ${prVerifier.address}`)
-
-    // wait 1 minute for the gatekeeper to be deployed
-    await new Promise((resolve) => setTimeout(resolve, 60000))
-
-    // don't verify if network is hardhat
-    if (network.name !== "hardhat") {
-        await hre.run("verify:verify", {
-            address: prVerifier.address,
-            constructorArguments: []
-        })
-    }
-
-    return prVerifier
+async function deployVerifier(factoryName: string) {
+    const VerifierFactory = await ethers.getContractFactory(factoryName)
+    const verifier = await VerifierFactory.deploy()
+    await verifier.deployed()
+    console.info(`${factoryName} contract has been deployed to: ${verifier.address}`)
+    return verifier
 }
 
 async function deployGateKeeper(semaphoreAddress: string, prVerifierAddress: string) {
@@ -51,11 +40,32 @@ async function deployGateKeeper(semaphoreAddress: string, prVerifierAddress: str
     }
 }
 
-async function deploy() {
-    // const prVerifier = await deployPrVerifier()
-    await deployGateKeeper("0xf4C4821434c0B54Dd0c45953A8fF38f6D15c2166", "0x2D6f61a7D4Fc62169327B7B58F59Bf21c1CFd037")
+async function deployZkBill() {
+    // const verifier = await deployVerifier("ZkBillVerifier")
+    const verifierAddress = "0x17798d86AFdAbc1010A95E2ae6DbaD187c89b55E"
+    const PackedUtilsFactory = await ethers.getContractFactory("PackedUtils")
+    const packedUtils = await PackedUtilsFactory.deploy()
+    await packedUtils.deployed()
+    console.info(`PackedUtils contract has been deployed to: ${packedUtils.address}`)
+    const ZkBillFactory = await ethers.getContractFactory("ZkBill", {
+        libraries: {
+            PackedUtils: packedUtils.address
+        }
+    })
+    const zkBill = await ZkBillFactory.deploy(
+        gateKeeperAddress,
+        tokenAddress,
+        ethers.utils.parseEther("100"),
+        verifierAddress
+    )
+
+    await zkBill.deployed()
+
+    console.info(`ZkBill contract has been deployed to: ${zkBill.address}`)
 }
 
-deploy()
+async function deploy() {}
+
+deployZkBill()
     .then(() => process.exit(0))
     .catch(console.log)

@@ -5,6 +5,9 @@
         "poseidonLibrary": "0x495D0753dEcC9Bb5740591ec2Ff3DA6a1760767a",
         "incrementalBinaryTree": "0xC96B68D9d89cfD0D0BaB2bc022366483CBDef9e9",
         "semaphore": "0xf4C4821434c0B54Dd0c45953A8fF38f6D15c2166",
-        "prVerifier": "0x2D6f61a7D4Fc62169327B7B58F59Bf21c1CFd037"
+        "prVerifier": "0x2D6f61a7D4Fc62169327B7B58F59Bf21c1CFd037",
+        "zkBillVerifier": "0x17798d86AFdAbc1010A95E2ae6DbaD187c89b55E",
+        "packedUtils": "0x14CCd8b3ea6EC2dbF70043DFb32914f3E30aC4D5",
+        "zkBill": "0x9B3c6558dAC55547533c13850F2e1E083888CAfb"
     }
 }
