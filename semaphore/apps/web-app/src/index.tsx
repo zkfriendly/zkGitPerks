@@ -6,6 +6,7 @@ import { createPublicClient, http } from "viem"
 import { scrollSepolia } from "wagmi/chains"
 import { darkTheme, getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import App from "./App"
+import "./App.css"
 import "@rainbow-me/rainbowkit/styles.css"
 
 // @ts-ignore

@@ -24,13 +24,11 @@ const PageContainerWrapper = styled.div`
     padding-bottom: 56px;
 `
 
-const PageContainer = ({children}: { children: React.ReactNode }) => {
-    return (
-        <PageContainerWrapper>
-            {children}
-        </PageContainerWrapper>
-    )
-}
+const PageContainer = ({children}: { children: React.ReactNode }) => (
+    <PageContainerWrapper>
+        {children}
+    </PageContainerWrapper>
+)
 
 function ColorMode() {
     const {colorMode, toggleColorMode} = useColorMode()
