@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Heading, Link, ListItem, OrderedList, Stack, Text } from "@chakra-ui/react"
+import { Box, Button, Divider, Heading, Highlight, Link, ListItem, OrderedList, Stack, Text } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -6,6 +6,7 @@ import { useAccount, useSignMessage } from "wagmi"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
+import useRepositoryName from "../hooks/useRepositoryName"
 
 export default function IdentitiesPage() {
     const navigate = useNavigate()
@@ -13,6 +14,7 @@ export default function IdentitiesPage() {
     const [_identity, setIdentity] = useState<Identity>()
     const { isConnected: active } = useAccount()
     const { signMessageAsync } = useSignMessage()
+    const repositoryName = useRepositoryName()
 
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
@@ -49,27 +51,33 @@ export default function IdentitiesPage() {
                 Welcom to Git Perks! 🎉
             </Heading>
 
-            <Text pt="2" fontSize="md">
-                Users interact with the protocol using a Semaphore{" "}
-                <Link href="https://semaphore.pse.dev/docs/guides/identities" color="primary.500" isExternal>
-                    identity
-                </Link>{" "}
-                (similar to Ethereum accounts). It contains three values:
+            <Text color="primary.900" fontSize="lg">
+                Join the{" "}
+                {repositoryName && (
+                    <a
+                        href={`https://github.com/${repositoryName}`}
+                        target="_blank"
+                        style={{ fontWeight: "bold", fontSize: "1.2em" }}
+                    >
+                        {repositoryName}
+                    </a>
+                )}{" "}
+                contributors club to enjoy all the available perks and benefits. You can{" "}
+                <Highlight query={["anonymously"]} styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}>
+                    anonymously
+                </Highlight>{" "}
+                claim reimbursements on event tickets, travel expenses, and much more. 💰
             </Text>
-            <OrderedList pl="20px" pt="5px" spacing="3">
-                <ListItem>Trapdoor: private, known only by user</ListItem>
-                <ListItem>Nullifier: private, known only by user</ListItem>
-                <ListItem>Commitment: public</ListItem>
-            </OrderedList>
 
             <Divider pt="5" borderColor="gray.500" />
 
             <Stack pt="5" justify="space-between">
+                <Text fontSize="lg" color="primary">
+                    Let's get you started by creating your Semaphore identity. This will allow you to join the
+                    contributors club and later claim your perks anonymously. 🕵🏽‍♂️
+                </Text>
                 <Text fontWeight="bold" fontSize="lg">
                     Identity Generated Based on Your Wallet
-                </Text>
-                <Text fontSize="sm" color="green.900">
-                    You don't need to write down or remember your identity. It's stored in your wallet.
                 </Text>
             </Stack>
 
@@ -93,7 +101,6 @@ export default function IdentitiesPage() {
                         w="100%"
                         fontWeight="bold"
                         justifyContent="left"
-                        colorScheme="primary"
                         px="4"
                         disabled={!active}
                         onClick={createIdentity}
