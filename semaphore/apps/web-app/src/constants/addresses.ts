@@ -6,7 +6,7 @@ export const GATEKEEPER_CONTRACT_ADDRESS_MAP: AddressMap = {
 }
 
 export const ZKBILL_CONTRACT_ADDRESS_MAP: AddressMap = {
-    [scrollSepolia.id]: "0x9B3c6558dAC55547533c13850F2e1E083888CAfb"
+    [scrollSepolia.id]: "0x63E38740bDa25B22DAd4872b2088f5AbfE0Da51E"
 }
 
 export const SEMAPHORE_CONTRACT_ADDRESS_MAP: AddressMap = {
