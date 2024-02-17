@@ -6,3 +6,4 @@ if (!import.meta.env.VITE_GROUP_ID) {
 // eslint-disable-next-line import/prefer-default-export
 export const GROUP_ID: string = import.meta.env.VITE_GROUP_ID
 export const PR_CIRCUIT_ID: string = "8131068d-2680-49f8-b35f-33831cad66e5"
+export const ZKBILL_CIRCUIT_ID: string = "eda66e6f-2b97-4fa4-94df-594eaa9e03d7"

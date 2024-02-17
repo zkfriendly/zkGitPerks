@@ -10,8 +10,8 @@ import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
 import IconRefreshLine from "../icons/IconRefreshLine"
-import { getPrProofInputs } from "../lib/input"
-import { PR_CIRCUIT_ID } from "../constants"
+import { getBillProofInputs, getPrProofInputs } from "../lib/input"
+import { PR_CIRCUIT_ID, ZKBILL_CIRCUIT_ID } from "../constants"
 import { gateKeeperABI } from "../abis/types/generated"
 import { TransactionState, ZkProofStatus } from "../types"
 import useZkEmail from "../hooks/useZkEmail"
@@ -45,8 +45,8 @@ export default function GroupsPage() {
     const [emailFull, setEmailFull] = useState("")
 
     const { generateProof, processedProof, status } = useZkEmail({
-        circuitId: PR_CIRCUIT_ID,
-        getProofInputs: getPrProofInputs,
+        circuitId: ZKBILL_CIRCUIT_ID,
+        getProofInputs: getBillProofInputs,
         identity: _identity!
     })
 

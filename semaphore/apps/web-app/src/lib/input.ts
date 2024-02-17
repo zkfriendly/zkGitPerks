@@ -12,6 +12,10 @@ export async function getPrProofInputs(emailFull: string, owner: string) {
     return getProofInputs(emailFull, "Merged #", "to:", RevealType.HEADER, 2048, 3072, owner)
 }
 
+export async function getBillProofInputs(emailFull: string, owner: string) {
+    return getProofInputs(emailFull, "Your payment of $ ", "Your payment of $ ", RevealType.BODY, 512, 512, owner)
+}
+
 export async function getProofInputs(
     emailFull: string,
     preSelector: string,
