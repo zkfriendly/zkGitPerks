@@ -3,17 +3,17 @@ import { verifyDKIMSignature } from "@zk-email/helpers/dist/dkim";
 import fs from "fs";
 import path from "path";
 
-const artifacts_dir = path.join(__dirname, "../../../artifacts/o2");
+const artifacts_dir = path.join(__dirname, "../../../artifacts/zkbill");
 
 if (!fs.existsSync(artifacts_dir)) {
   fs.mkdirSync(artifacts_dir, { recursive: true });
 }
 
 export async function getInputs(rawEmail: string, owner: string) {
-  const STRING_PRESELECTOR = "Rechnungsbetrag:";
-  const TOTAL_CHARGE_SELECTOR = "Rechnungsbetrag:";
-  const MAX_HEADER_PADDED_BYTES = 2048;
-  const MAX_BODY_PADDED_BYTES = 3 * 1024;
+  const STRING_PRESELECTOR = "Your payment of $ ";
+  const TOTAL_CHARGE_SELECTOR = "Your payment of $ ";
+  const MAX_HEADER_PADDED_BYTES = 512;
+  const MAX_BODY_PADDED_BYTES = 512;
 
   console.log("Verifying DKIM signature...");
 
@@ -48,7 +48,7 @@ export async function getInputs(rawEmail: string, owner: string) {
 
 (async function generateInputs() {
   const rawEmail = fs.readFileSync(
-    path.join(__dirname, "../../../emls/o2bill.eml"),
+    path.join(__dirname, "../../../emls/zkmail.eml"),
     "utf8"
   );
   const owner =
