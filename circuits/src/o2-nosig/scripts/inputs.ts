@@ -13,11 +13,14 @@ export async function getInputs(rawEmail: string, owner: string) {
   const STRING_PRESELECTOR = "Rechnungsbetrag:";
   const TOTAL_CHARGE_SELECTOR = "Rechnungsbetrag:";
   const MAX_HEADER_PADDED_BYTES = 2048;
-  const MAX_BODY_PADDED_BYTES = 3 * 1024;
+  const MAX_BODY_PADDED_BYTES = 32896;
 
   console.log("Verifying DKIM signature...");
 
-  const dkimResult = await verifyDKIMSignature(Buffer.from(rawEmail));
+  const dkimResult = await verifyDKIMSignature(
+    Buffer.from(rawEmail),
+    "mailservices-sc.de"
+  );
 
   const emailVerifierInputs = generateCircuitInputs({
     rsaSignature: dkimResult.signature,

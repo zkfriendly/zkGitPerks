@@ -60,4 +60,4 @@ template O2BillVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, max_t
     owner_out <== owner;
 }
 
-component main = HerokuBillVerifier(2048, 13312, 121, 17, 31, 10);
+component main = O2BillVerifier(2048, 32896, 121, 17, 31, 10);
