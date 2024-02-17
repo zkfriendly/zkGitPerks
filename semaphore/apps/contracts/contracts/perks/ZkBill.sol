@@ -19,6 +19,9 @@ contract ZkBill {
     uint256 public maxRefund; // max price that will be refunded
     address public groth16verifier;
 
+    uint256 public scopeSeed;
+    uint256 public lastScopeRefreshTimestamp;
+
     struct GateKeeperProof {
         uint256 merkleTreeRoot;
         uint256 nullifierHash;
@@ -33,6 +36,7 @@ contract ZkBill {
     }
 
     event Claimed(address indexed contributor, uint256 amount);
+    event ScopeRefreshed(uint256 newScopeSeed);
 
     error InvalidProof();
 
@@ -41,6 +45,9 @@ contract ZkBill {
         token = _token;
         maxRefund = _maxRefund;
         groth16verifier = _verifier;
+
+        scopeSeed = uint256(keccak256(abi.encodePacked(address(this), blockhash(block.number))));
+        lastScopeRefreshTimestamp = block.timestamp;
     }
 
     function claim(GateKeeperProof calldata gateKeeperProof, Proof calldata proof) external {
@@ -67,6 +74,17 @@ contract ZkBill {
     }
 
     function getScope() public view returns (uint256) {
-        return uint(keccak256(abi.encodePacked(address(this))));
+        return uint(keccak256(abi.encodePacked(scopeSeed)));
+    }
+
+    function refreshScope() external {
+        require(
+            block.timestamp - lastScopeRefreshTimestamp > 30 days,
+            "ZkBill: scope can only be refreshed once a month"
+        );
+        scopeSeed = uint256(keccak256(abi.encodePacked(scopeSeed, blockhash(block.number))));
+        lastScopeRefreshTimestamp = block.timestamp;
+
+        emit ScopeRefreshed(scopeSeed);
     }
 }
