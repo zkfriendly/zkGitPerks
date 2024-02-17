@@ -21,8 +21,16 @@ export default function EmailInput({
     return (
         <>
             <DragAndDropTextBox onFileDrop={onFileDrop} />
-            <Text>or copy paste full PR email with headers</Text>
-            <Textarea value={emailFull} onChange={(e) => setEmailFull(e.target.value)}></Textarea>
+            <Text my={2} textAlign={"center"}>
+                or copy paste full PR email with headers bellow
+            </Text>
+            <Textarea
+                placeholder={"Paste full PR email with headers"}
+                mb={6}
+                resize={"none"}
+                value={emailFull}
+                onChange={(e) => setEmailFull(e.target.value)}
+            ></Textarea>
         </>
     )
 }

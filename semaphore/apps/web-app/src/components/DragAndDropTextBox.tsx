@@ -1,6 +1,6 @@
 import React from "react"
-import { useDragAndDrop } from "../hooks/useDragAndDrop"
 import styled from "styled-components"
+import { useDragAndDrop } from "../hooks/useDragAndDrop"
 
 type Props = {
     onFileDrop: (file: File) => void
@@ -11,6 +11,7 @@ const DragAndDropTextBoxWrapper = styled.div`
     flex-direction: column;
     align-items: center;
     border: 2px dashed #ccc;
+    border-radius: 6px;
     padding: 20px;
 `
 

@@ -15,6 +15,7 @@ import { gateKeeperABI } from "../abis/types/generated"
 import { TransactionState, ZkProofStatus } from "../types"
 import useZkEmail from "../hooks/useZkEmail"
 import EmailInput from "../components/EmailInput"
+import { PageBodyContainer } from "./index"
 
 export default function GroupsPage() {
     const navigate = useNavigate()
@@ -77,59 +78,68 @@ export default function GroupsPage() {
 
     return (
         <>
-            <Heading as="h2" size="xl">
+            <Heading as="h2" size="xl" mb={3}>
                 Contributors Club 💻
             </Heading>
-            <Stack spacing={2}>
-                <Text color="primary.500">
-                    But first you need to prove your a contributor. upload an email you received that shows your PR was
-                    merged into main. 📧
-                </Text>
-            </Stack>
-            <Divider pt="5" borderColor="gray.500" />
-            <HStack py="5" justify="space-between">
-                <Text fontWeight="bold" fontSize="lg">
-                    Total Contributors ({_users ? _users.length : "..."})
-                </Text>
-                <Button leftIcon={<IconRefreshLine />} variant="link" color="text.700" onClick={refreshUsers}>
-                    Refresh
-                </Button>
-            </HStack>
-            <EmailInput emailFull={emailFull} setEmailFull={setEmailFull} />
-            <Button
-                w="100%"
-                fontWeight="bold"
-                justifyContent="left"
-                px="4"
-                disabled={status === ZkProofStatus.GENERATING || txState === TransactionState.AWAITING_TRANSACTION}
-                onClick={() => {
-                    if (processedProof) {
-                        if (txState === TransactionState.INITIAL) {
-                            joinContributors()
+            <PageBodyContainer>
+                <Stack spacing={2}>
+                    <Text color="primary.500" lineHeight="2rem" fontSize="lg">
+                        But first you need to prove your a contributor. upload an email you received that shows your PR
+                        was merged into main. 📧
+                    </Text>
+                </Stack>
+                <Divider pt="5" borderColor="gray.500" />
+                <HStack py="5" justify="space-between">
+                    <Text fontWeight="bold" fontSize="lg">
+                        Total Contributors ({_users ? _users.length : "..."})
+                    </Text>
+                    <Button leftIcon={<IconRefreshLine />} variant="link" color="text.700" onClick={refreshUsers}>
+                        Refresh
+                    </Button>
+                </HStack>
+                <EmailInput emailFull={emailFull} setEmailFull={setEmailFull} />
+                <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
+                    <Button
+                        mb={6}
+                        fontWeight="bold"
+                        justifyContent="left"
+                        px="4"
+                        disabled={
+                            status === ZkProofStatus.GENERATING || txState === TransactionState.AWAITING_TRANSACTION
                         }
-                    } else if (status === ZkProofStatus.INITIAL) {
-                        generateProof(emailFull)
-                    }
-                }}
-            >
-                {status === ZkProofStatus.INITIAL && "Generate Proof"}
-                {status === ZkProofStatus.GENERATING && "Preparing ZK proof..."}
-                {status === ZkProofStatus.READY && txState === TransactionState.INITIAL && "Proof ready! click to join"}
-                {txState === TransactionState.AWAITING_USER_APPROVAL && "Confirm transaction"}
-                {txState === TransactionState.AWAITING_TRANSACTION && "Waiting for transaction"}
-            </Button>
-            {_users && _users.length > 0 && (
-                <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
-                    {_users.map((user, i) => (
-                        <HStack key={i} p="3" borderWidth={1} whiteSpace="nowrap">
-                            <Text textOverflow="ellipsis" overflow="hidden">
-                                {user}
-                            </Text>
-                        </HStack>
-                    ))}
-                </VStack>
-            )}
-            <Divider pt="6" borderColor="gray" />
+                        onClick={() => {
+                            if (processedProof) {
+                                if (txState === TransactionState.INITIAL) {
+                                    joinContributors()
+                                }
+                            } else if (status === ZkProofStatus.INITIAL) {
+                                generateProof(emailFull)
+                            }
+                        }}
+                    >
+                        {status === ZkProofStatus.INITIAL && "Generate Proof"}
+                        {status === ZkProofStatus.GENERATING && "Preparing ZK proof..."}
+                        {status === ZkProofStatus.READY &&
+                            txState === TransactionState.INITIAL &&
+                            "Proof ready! click to join"}
+                        {txState === TransactionState.AWAITING_USER_APPROVAL && "Confirm transaction"}
+                        {txState === TransactionState.AWAITING_TRANSACTION && "Waiting for transaction"}
+                    </Button>
+                </div>
+                {_users && _users.length > 0 && (
+                    <VStack spacing="2" align="left" maxHeight="300px" overflowY="auto">
+                        {_users.map((user, i) => (
+                            <HStack key={i} borderRadius="5px" p="3" borderWidth={1} whiteSpace="nowrap">
+                                <Text textOverflow="ellipsis" overflow="hidden">
+                                    {user}
+                                </Text>
+                            </HStack>
+                        ))}
+                    </VStack>
+                )}
+            </PageBodyContainer>
+
+            <Divider borderColor="gray" marginTop="0 !important" />
             <Stepper
                 step={2}
                 onPrevClick={() => navigate("/")}
