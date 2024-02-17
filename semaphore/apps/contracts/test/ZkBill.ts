@@ -17,7 +17,7 @@ describe("ZkBill", async () => {
     let gateKeeperContract: GateKeeper
     let verifier: ZkBillVerifier
     let token: MockContract
-    const maxRefund: BigNumber = ethers.utils.parseEther("0.1")
+    const maxRefund: BigNumber = ethers.utils.parseEther("250")
     let signer: SignerWithAddress
     const user = new Identity(
         "0xf7c78877048e423e22cafb473dc6e1324ea9a9c2463ad7d7d58ca5ec98e94dfd751ab265e92acac16040d46a7ccfabd4f322ffe1bc9dc93144ed81735f04dc801c"
@@ -74,7 +74,8 @@ describe("ZkBill", async () => {
             nullifierHash: commitmentProof.nullifierHash,
             proof: commitmentProof.proof
         }
-        await token.mock.transfer.withArgs(signer.address, maxRefund).returns(true)
+        await token.mock.transfer.withArgs(signer.address, ethers.utils.parseEther("120")).returns(true)
+        await token.mock.decimals.returns(18)
         //@ts-ignore
         await mainContract.connect(signer).claim(gateKeeperProof, zkBillProof.calldata)
     })

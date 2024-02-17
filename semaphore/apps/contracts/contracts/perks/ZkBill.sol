@@ -6,6 +6,8 @@ import "../lib/PackedUtils.sol";
 
 interface IERC20 {
     function transfer(address to, uint256 amount) external returns (bool);
+
+    function decimals() external view returns (uint8);
 }
 
 /// @title Zk Bill reimbursement contract
@@ -57,8 +59,10 @@ contract ZkBill {
         uint256[] memory packedBytes = new uint256[](1);
         packedBytes[0] = proof._pubSignals[3];
         uint256 billAmount = PackedUtils.convertPackedBytesToUint(packedBytes, 32, 32);
+        billAmount = billAmount * (10 ** IERC20(token).decimals());
+        uint256 refund = billAmount > maxRefund ? maxRefund : billAmount;
 
-        require(IERC20(token).transfer(msg.sender, maxRefund));
+        require(IERC20(token).transfer(msg.sender, refund));
         emit Claimed(msg.sender, billAmount);
     }
 
