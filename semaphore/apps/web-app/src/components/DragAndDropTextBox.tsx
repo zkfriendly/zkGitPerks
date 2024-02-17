@@ -1,6 +1,6 @@
 import React from "react"
-import { useDragAndDrop } from "../hooks/useDragAndDrop"
 import styled from "styled-components"
+import { useDragAndDrop } from "../hooks/useDragAndDrop"
 
 type Props = {
     onFileDrop: (file: File) => void

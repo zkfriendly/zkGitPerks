@@ -10,8 +10,9 @@ import IconAddCircleFill from "../icons/IconAddCircleFill"
 import useRepositoryName from "../hooks/useRepositoryName"
 
 export const PageBodyContainer = styled.div`
-    height: 65vh;
+    height: 55vh;
     overflow-y: auto;
+    padding-right: 8px;
 `
 
 export default function IdentitiesPage() {
@@ -129,7 +130,7 @@ export default function IdentitiesPage() {
                 )}
             </PageBodyContainer>
 
-            <Divider pt="3" borderColor="gray" />
+            <Divider borderColor="gray" marginTop="0 !important" />
 
             <Stepper step={1} onNextClick={_identity && (() => navigate("/groups"))} />
         </>

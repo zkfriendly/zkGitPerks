@@ -139,7 +139,7 @@ export default function GroupsPage() {
                 )}
             </PageBodyContainer>
 
-            <Divider pt="3" borderColor="gray" />
+            <Divider borderColor="gray" marginTop="0 !important" />
             <Stepper
                 step={2}
                 onPrevClick={() => navigate("/")}

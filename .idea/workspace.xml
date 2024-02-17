@@ -5,10 +5,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d2ebf95c-5b54-4733-b20a-1ef9250ddd08" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/App.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/components/DragAndDropTextBox.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/components/DragAndDropTextBox.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/components/EmailInput.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/components/EmailInput.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/groups.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/groups.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/index.tsx" afterDir="false" />
     </list>
@@ -89,7 +86,7 @@
       <updated>1708124369674</updated>
       <workItem from="1708124370766" duration="151000" />
       <workItem from="1708170380229" duration="3302000" />
-      <workItem from="1708209024422" duration="3982000" />
+      <workItem from="1708209024422" duration="4280000" />
     </task>
     <servers />
   </component>
