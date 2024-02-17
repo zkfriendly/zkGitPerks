@@ -3,14 +3,18 @@ import { verifyDKIMSignature } from "@zk-email/helpers/dist/dkim";
 import fs from "fs";
 import path from "path";
 
-const artifacts_dir = path.join(__dirname, "../../../artifacts/cowork");
+const artifacts_dir = path.join(__dirname, "../../../artifacts/godaddy");
 
 if (!fs.existsSync(artifacts_dir)) {
   fs.mkdirSync(artifacts_dir, { recursive: true });
 }
 
 export async function getInputs(rawEmail: string, owner: string) {
+  const STRING_PRESELECTOR = ".XYZ Domain Registration";
   const MAX_HEADER_PADDED_BYTES = 2048;
+  const MAX_BODY_PADDED_BYTES = 51200;
+
+  console.log("Verifying DKIM signature...");
 
   const dkimResult = await verifyDKIMSignature(Buffer.from(rawEmail));
 
@@ -20,16 +24,18 @@ export async function getInputs(rawEmail: string, owner: string) {
     body: dkimResult.body,
     bodyHash: dkimResult.bodyHash,
     message: dkimResult.message,
-    shaPrecomputeSelector: "",
+    shaPrecomputeSelector: STRING_PRESELECTOR,
     maxMessageLength: MAX_HEADER_PADDED_BYTES,
-    maxBodyLength: 187392,
-    ignoreBodyHashCheck: true,
+    maxBodyLength: MAX_BODY_PADDED_BYTES,
   });
 
   const inputJson = {
     ...emailVerifierInputs,
+    to_index: 0,
     owner,
   };
+
+  console.log("Inputs generated successfully!");
 
   return inputJson;
 }
