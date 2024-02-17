@@ -3,7 +3,7 @@ import ReactDOM from "react-dom"
 import { BrowserRouter } from "react-router-dom"
 import { createConfig, WagmiConfig } from "wagmi"
 import { createPublicClient, http } from "viem"
-import { sepolia } from "wagmi/chains"
+import { scrollSepolia } from "wagmi/chains"
 import { getDefaultWallets, lightTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import App from "./App"
 import "@rainbow-me/rainbowkit/styles.css"
@@ -17,14 +17,14 @@ if (!WALLETCONNECT_PROJECT_ID) {
 
 const { connectors } = getDefaultWallets({
     appName: "Git Perks",
-    chains: [sepolia],
+    chains: [scrollSepolia],
     projectId: WALLETCONNECT_PROJECT_ID
 })
 
 const config = createConfig({
     autoConnect: true,
     publicClient: createPublicClient({
-        chain: sepolia,
+        chain: scrollSepolia,
         transport: http()
     }),
     connectors
@@ -33,7 +33,7 @@ const config = createConfig({
 ReactDOM.render(
     <React.StrictMode>
         <WagmiConfig config={config}>
-            <RainbowKitProvider chains={[sepolia]} theme={lightTheme()}>
+            <RainbowKitProvider chains={[scrollSepolia]} theme={lightTheme()}>
                 <BrowserRouter>
                     <App />
                 </BrowserRouter>

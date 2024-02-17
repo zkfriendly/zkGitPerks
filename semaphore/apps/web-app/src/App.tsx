@@ -27,7 +27,7 @@ export default function App() {
                 <ConnectButton />
             </HStack>
 
-            <Container maxW="lg" flex="1" display="flex" alignItems="center">
+            <Container maxW="800" flex="1" display="flex" alignItems="center">
                 <Stack py="8" display="flex" width="100%">
                     <SemaphoreContext.Provider value={semaphore}>
                         <LogsContext.Provider

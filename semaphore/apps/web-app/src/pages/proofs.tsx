@@ -1,4 +1,25 @@
-import { Box, Button, Divider, Heading, HStack, Link, Text, useBoolean, VStack } from "@chakra-ui/react"
+import {
+    Accordion,
+    AccordionButton,
+    AccordionIcon,
+    AccordionItem,
+    AccordionPanel,
+    Box,
+    Button,
+    Card,
+    CardBody,
+    CardFooter,
+    Divider,
+    Heading,
+    Highlight,
+    HStack,
+    Image,
+    Stack,
+    StackDivider,
+    Text,
+    useBoolean,
+    VStack
+} from "@chakra-ui/react"
 import { Group } from "@semaphore-protocol/group"
 import { Identity } from "@semaphore-protocol/identity"
 import { generateProof } from "@semaphore-protocol/proof"
@@ -12,6 +33,9 @@ import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
 import IconAddCircleFill from "../icons/IconAddCircleFill"
 import IconRefreshLine from "../icons/IconRefreshLine"
+import useRepositoryName from "../hooks/useRepositoryName"
+import { PerkCard } from "../components/PerkCard"
+import { getPrProofInputs } from "../lib/input"
 
 export default function ProofsPage() {
     const navigate = useNavigate()
@@ -19,6 +43,7 @@ export default function ProofsPage() {
     const { _users, _feedback, refreshFeedback, addFeedback } = useContext(SemaphoreContext)
     const [_loading, setLoading] = useBoolean()
     const [_identity, setIdentity] = useState<Identity>()
+    const repositoryName = useRepositoryName()
 
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
@@ -105,19 +130,37 @@ export default function ProofsPage() {
     return (
         <>
             <Heading as="h2" size="xl">
-                Proofs
+                You can choose from all the available perks 🎁
             </Heading>
 
             <Text pt="2" fontSize="md">
-                Semaphore members can anonymously{" "}
-                <Link href="https://semaphore.pse.dev/docs/guides/proofs" color="primary.500" isExternal>
-                    prove
-                </Link>{" "}
-                that they are part of a group and that they are generating their own signals. Signals could be anonymous
-                votes, leaks, reviews, or feedback.
+                You can now choose from all the available perks and enjoy the benefits of being a contributor to the{" "}
+                {repositoryName && (
+                    <a href={`https://github.com/${repositoryName}`} target="_blank" style={{ color: "#0072f0" }}>
+                        <Highlight
+                            query={[repositoryName]}
+                            styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}
+                        >
+                            {repositoryName}
+                        </Highlight>
+                    </a>
+                )}{" "}
+                project.
             </Text>
 
             <Divider pt="5" borderColor="gray.500" />
+
+            <Accordion allowToggle defaultIndex={0}>
+                <PerkCard
+                    title="TUM Blockchain Conference"
+                    description="Get a free ticket to the TUM Blockchain Conference"
+                    image="https://assets-global.website-files.com/631ad94cbdadc40fe03d6458/64a1e89791a37d7a89e28e71_mega-creator%20(14).svg"
+                    details="This is a one-time offer of $ 120 which you can claim by providing your ticket purchase receipt."
+                    circuitId="0"
+                    identity={_identity!}
+                    getProofInputs={getPrProofInputs}
+                />
+            </Accordion>
 
             <HStack py="5" justify="space-between">
                 <Text fontWeight="bold" fontSize="lg">
@@ -127,6 +170,8 @@ export default function ProofsPage() {
                     Refresh
                 </Button>
             </HStack>
+
+            <VStack divider={<StackDivider borderColor="gray.200" />} spacing={4} align="stretch"></VStack>
 
             <Box pb="5">
                 <Button

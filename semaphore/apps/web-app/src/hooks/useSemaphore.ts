@@ -1,4 +1,4 @@
-import { SemaphoreEthers } from "@semaphore-protocol/data"
+import { SemaphoreEthers, SemaphoreSubgraph } from "@semaphore-protocol/data"
 import { BigNumber, utils } from "ethers"
 import { useCallback, useState } from "react"
 import { SemaphoreContextType } from "../context/SemaphoreContext"
@@ -18,11 +18,11 @@ export default function useSemaphore({ groupId }: { groupId: string }): Semaphor
     const [_feedback, setFeedback] = useState<string[]>([])
 
     const refreshUsers = useCallback(async (): Promise<void> => {
-        const semaphore = new SemaphoreEthers(ethereumNetwork, {
-            address: semaphoreAddress
-        })
-        const members = await semaphore.getGroupMembers(groupId)
-        setUsers(members)
+        const semaphore = new SemaphoreSubgraph("https://api.studio.thegraph.com/query/65978/semaphore/version/latest")
+        const gp = await semaphore.getGroup(groupId, { members: true })
+        const members = gp.members
+        console.log(gp.members)
+        // setUsers(members)
     }, [])
 
     const addUser = useCallback(
@@ -33,14 +33,11 @@ export default function useSemaphore({ groupId }: { groupId: string }): Semaphor
     )
 
     const refreshFeedback = useCallback(async (): Promise<void> => {
-        const semaphore = new SemaphoreEthers(ethereumNetwork, {
-            // @ts-ignore
-            address: semaphoreAddress
-        })
+        const semaphore = new SemaphoreSubgraph("https://api.studio.thegraph.com/query/65978/semaphore/version/latest")
 
-        const proofs = await semaphore.getGroupVerifiedProofs(groupId)
+        // const proofs = await semaphore.getGroupVerifiedProofs(groupId)
 
-        setFeedback(proofs.map(({ signal }: any) => utils.parseBytes32String(BigNumber.from(signal).toHexString())))
+        // setFeedback(proofs.map(({ signal }: any) => utils.parseBytes32String(BigNumber.from(signal).toHexString())))
     }, [])
 
     const addFeedback = useCallback(
