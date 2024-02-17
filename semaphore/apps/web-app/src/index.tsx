@@ -4,7 +4,7 @@ import { BrowserRouter } from "react-router-dom"
 import { createConfig, WagmiConfig } from "wagmi"
 import { createPublicClient, http } from "viem"
 import { scrollSepolia } from "wagmi/chains"
-import { getDefaultWallets, lightTheme, RainbowKitProvider } from "@rainbow-me/rainbowkit"
+import { darkTheme, getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit"
 import App from "./App"
 import "@rainbow-me/rainbowkit/styles.css"
 
@@ -33,7 +33,7 @@ const config = createConfig({
 ReactDOM.render(
     <React.StrictMode>
         <WagmiConfig config={config}>
-            <RainbowKitProvider chains={[scrollSepolia]} theme={lightTheme()}>
+            <RainbowKitProvider chains={[scrollSepolia]} theme={darkTheme()}>
                 <BrowserRouter>
                     <App />
                 </BrowserRouter>
