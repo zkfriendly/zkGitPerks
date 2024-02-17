@@ -13,6 +13,7 @@ import { config } from "./package.json"
 import "./tasks/deploy"
 
 dotenvConfig({ path: resolve(__dirname, "../../.env") })
+dotenvConfig({ path: ".env" })
 
 function getNetworks(): NetworksUserConfig {
     if (!process.env.INFURA_API_KEY || !process.env.ETHEREUM_PRIVATE_KEY) {

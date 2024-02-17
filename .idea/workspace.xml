@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d2ebf95c-5b54-4733-b20a-1ef9250ddd08" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/semaphore/apps/contracts/contracts/verifiers/HerokuVerifier.sol" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/semaphore/apps/contracts/test/HerokuBill.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/semaphore/apps/contracts/test/sample_proof/herokubill_proof.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/abis/zkBill.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/semaphore/apps/web-app/theme.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/contracts/hardhat.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/contracts/hardhat.config.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/contracts/scripts/deploy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/contracts/scripts/deploy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/contracts/scripts/deployedContracts.json" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/contracts/scripts/deployedContracts.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/abis/types/generated.ts" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/abis/types/generated.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/constants/addresses.ts" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/constants/addresses.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/constants/chains.ts" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/constants/chains.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/constants/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/constants/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/hooks/useSemaphore.ts" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/hooks/useSemaphore.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/hooks/useZkEmail.ts" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/hooks/useZkEmail.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/lib/input.ts" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/lib/input.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/groups.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/groups.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/proofs.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/src/pages/proofs.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/semaphore/apps/web-app/wagmi.config.ts" beforeDir="false" afterPath="$PROJECT_DIR$/semaphore/apps/web-app/wagmi.config.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitToolBoxStore">
+    <option name="projectConfigVersion" value="5" />
+    <option name="recentBranches">
+      <RecentBranches>
+        <option name="branchesForRepo">
+          <list>
+            <RecentBranchesForRepo>
+              <option name="branches">
+                <list>
+                  <RecentBranch>
+                    <option name="branchName" value="develop" />
+                    <option name="lastUsedInstant" value="1708170390" />
+                  </RecentBranch>
+                  <RecentBranch>
+                    <option name="branchName" value="main" />
+                    <option name="lastUsedInstant" value="1708170389" />
+                  </RecentBranch>
+                </list>
+              </option>
+              <option name="repositoryRootUrl" value="file://$PROJECT_DIR$" />
+            </RecentBranchesForRepo>
+          </list>
+        </option>
+      </RecentBranches>
+    </option>
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="2cT8mtvhijXeMSOULqcOiSQa3Vq" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Merging develop",
+    "last_opened_file_path": "C:/Users/amire/Work/coreDevsDao/semaphore/apps/web-app",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "yarn",
+    "ts.external.directory.path": "C:\\Users\\amire\\Work\\coreDevsDao\\semaphore\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\amire\Work\coreDevsDao\semaphore\apps\web-app" />
+    </key>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d2ebf95c-5b54-4733-b20a-1ef9250ddd08" name="Changes" comment="" />
+      <created>1708124369674</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1708124369674</updated>
+      <workItem from="1708124370766" duration="151000" />
+      <workItem from="1708170380229" duration="3302000" />
+      <workItem from="1708209024422" duration="950000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
