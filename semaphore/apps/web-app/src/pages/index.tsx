@@ -1,4 +1,4 @@
-import { Box, Button, Divider, Heading, Highlight, Link, ListItem, OrderedList, Stack, Text } from "@chakra-ui/react"
+import { Box, Button, Divider, Heading, Highlight, Stack, Text } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -48,7 +48,7 @@ export default function IdentitiesPage() {
     return (
         <>
             <Heading as="h2" size="xl">
-                Welcom to Git Perks! 🎉
+                Welcome to Git Perks! 🎉
             </Heading>
 
             <Text color="primary.900" fontSize="lg">

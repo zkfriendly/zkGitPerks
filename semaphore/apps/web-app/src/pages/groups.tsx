@@ -82,7 +82,7 @@ export default function GroupsPage() {
             </Heading>
             <Stack spacing={2}>
                 <Text color="primary.500">
-                    But first you need to prove your a contributor. upload an email you rceived that shows your PR was
+                    But first you need to prove your a contributor. upload an email you received that shows your PR was
                     merged into main. 📧
                 </Text>
             </Stack>
