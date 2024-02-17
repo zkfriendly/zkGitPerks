@@ -24,7 +24,6 @@ export default function GroupsPage() {
     const { _users, refreshUsers } = useContext(SemaphoreContext)
     const [_identity, setIdentity] = useState<Identity>()
     const gateKeeperAddress = useContractAddress(GATEKEEPER_CONTRACT_ADDRESS_MAP)
-    const repositoryName = useRepositoryName()
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
 
@@ -84,20 +83,7 @@ export default function GroupsPage() {
                 Contributors Club 💻
             </Heading>
             <Stack spacing={2}>
-                <Text color="green.900">
-                    Join the{" "}
-                    {repositoryName && (
-                        <a href={`https://github.com/${repositoryName}`} target="_blank" style={{ color: "#0072f0" }}>
-                            {repositoryName}
-                        </a>
-                    )}{" "}
-                    contributors club to enjoy all the available perks and benefits. You can{" "}
-                    <Highlight query={["anonymously"]} styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}>
-                        anonymously
-                    </Highlight>
-                    claim reimbursements on event tickets, travel expenses, and much more. 💰
-                </Text>
-                <Text color="blue.500">
+                <Text color="primary.500">
                     But first you need to prove your a contributor. upload an email you rceived that shows your PR was
                     merged into main. 📧
                 </Text>
@@ -112,7 +98,11 @@ export default function GroupsPage() {
                 </Button>
             </HStack>
             <EmailInput emailFull={emailFull} setEmailFull={setEmailFull} />
-            <AppButton
+            <Button
+                w="100%"
+                fontWeight="bold"
+                justifyContent="left"
+                px="4"
                 disabled={status === ZkProofStatus.GENERATING || txState === TransactionState.AWAITING_TRANSACTION}
                 onClick={() => {
                     if (processedProof) {
@@ -129,7 +119,7 @@ export default function GroupsPage() {
                 {status === ZkProofStatus.READY && txState === TransactionState.INITIAL && "Proof ready! click to join"}
                 {txState === TransactionState.AWAITING_USER_APPROVAL && "Confirm transaction"}
                 {txState === TransactionState.AWAITING_TRANSACTION && "Waiting for transaction"}
-            </AppButton>
+            </Button>
             {_users && _users.length > 0 && (
                 <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
                     {_users.map((user, i) => (
