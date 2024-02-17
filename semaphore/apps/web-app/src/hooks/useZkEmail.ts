@@ -21,7 +21,7 @@ const headers = {
     Accept: "application/json",
     Authorization: `Bearer ${apiKey}`
 }
-export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEmailProps) {
+export default function useZkEmail<PubSignalType>({ identity, circuitId, getProofInputs }: ZkEmailProps) {
     const [status, setStatus] = useState(ZkProofStatus.INITIAL)
     const { setLogs } = useContext(LogsContext)
 
@@ -96,7 +96,7 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
               _pA: readonly [bigint, bigint]
               _pB: readonly [readonly [bigint, bigint], readonly [bigint, bigint]]
               _pC: readonly [bigint, bigint]
-              _pubSignals: readonly [bigint, bigint, bigint, bigint, bigint]
+              _pubSignals: PubSignalType
           }
         | undefined
     >(undefined)
@@ -114,7 +114,7 @@ export default function useZkEmail({ identity, circuitId, getProofInputs }: ZkEm
                         [bigint, bigint]
                     ],
                     _pC: calldata[2].map((x: string) => BigInt(x)) as [bigint, bigint],
-                    _pubSignals: calldata[3].map((x: string) => BigInt(x)) as [bigint, bigint, bigint, bigint, bigint]
+                    _pubSignals: calldata[3].map((x: string) => BigInt(x)) as PubSignalType
                 })
             })
         }

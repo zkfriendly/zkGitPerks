@@ -1,31 +1,36 @@
-import { Box, Button, Divider, Heading, HStack, Link, Text, useBoolean, VStack } from "@chakra-ui/react"
-import { Group } from "@semaphore-protocol/group"
+import { Button, Divider, Heading, HStack, Stack, Text, VStack } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
-import { generateProof } from "@semaphore-protocol/proof"
-import { BigNumber, utils } from "ethers"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import Feedback from "../../contract-artifacts/Feedback.json"
+import { prepareWriteContract, waitForTransaction, writeContract } from "@wagmi/core"
+import { Group } from "@semaphore-protocol/group"
+import { keccak256 } from "viem"
+import { generateProof as generateSemaphoreProof } from "@semaphore-protocol/proof"
+import { useContractAddress } from "../hooks/useContractAddress"
+import { GATEKEEPER_CONTRACT_ADDRESS_MAP, ZKBILL_CONTRACT_ADDRESS_MAP } from "../constants/addresses"
 import Stepper from "../components/Stepper"
 import LogsContext from "../context/LogsContext"
 import SemaphoreContext from "../context/SemaphoreContext"
-import IconAddCircleFill from "../icons/IconAddCircleFill"
 import IconRefreshLine from "../icons/IconRefreshLine"
-import { useContractAddress } from "../hooks/useContractAddress"
-import { GATEKEEPER_CONTRACT_ADDRESS_MAP } from "../constants/addresses"
-import { useGateKeeperContributorsGroupId } from "../abis/types/generated"
+import { getBillProofInputs } from "../lib/input"
+import { ZKBILL_CIRCUIT_ID } from "../constants"
+import { useGateKeeperContributorsGroupId, useZkBillGetScope, zkBillABI } from "../abis/types/generated"
+import { TransactionState, ZkProofStatus } from "../types"
+import useZkEmail from "../hooks/useZkEmail"
+import EmailInput from "../components/EmailInput"
 
-export default function ProofsPage() {
+export default function GroupsPage() {
     const navigate = useNavigate()
     const { setLogs } = useContext(LogsContext)
-    const { _users, _feedback, refreshFeedback, addFeedback } = useContext(SemaphoreContext)
-    const [_loading, setLoading] = useBoolean()
+    const { _users, refreshUsers } = useContext(SemaphoreContext)
     const [_identity, setIdentity] = useState<Identity>()
+    const zkBillAddress = useContractAddress(ZKBILL_CONTRACT_ADDRESS_MAP)
     const gateKeeperAddress = useContractAddress(GATEKEEPER_CONTRACT_ADDRESS_MAP)
 
     const { data: groupId } = useGateKeeperContributorsGroupId({
         address: gateKeeperAddress
     })
+
     useEffect(() => {
         const identityString = localStorage.getItem("identity")
 
@@ -33,137 +38,130 @@ export default function ProofsPage() {
             navigate("/")
             return
         }
-
         setIdentity(new Identity(identityString))
     }, [])
 
     useEffect(() => {
-        if (_feedback.length > 0) {
-            setLogs(`${_feedback.length} feedback retrieved from the group 🤙🏽`)
+        if (_users && _users.length > 0) {
+            setLogs(`${_users.length} user${_users.length > 1 ? "s" : ""} retrieved from the group 🤙🏽`)
         }
-    }, [_feedback])
+    }, [_users])
+    const userHasJoined = useCallback(
+        (identity: Identity) => _users?.includes(identity.commitment.toString()),
+        [_users]
+    )
 
-    const sendFeedback = useCallback(async () => {
-        if (!_identity || !groupId) {
+    const [emailFull, setEmailFull] = useState("")
+
+    const { generateProof, processedProof, status } = useZkEmail<readonly [bigint, bigint, bigint, bigint]>({
+        circuitId: ZKBILL_CIRCUIT_ID,
+        getProofInputs: getBillProofInputs,
+        identity: _identity!
+    })
+
+    const [txState, setTxState] = useState(TransactionState.INITIAL)
+
+    const { data: scope } = useZkBillGetScope({
+        address: zkBillAddress
+    })
+
+    const submitMailProof = useCallback(async () => {
+        if (
+            txState !== TransactionState.INITIAL ||
+            !zkBillAddress ||
+            !processedProof ||
+            !_identity ||
+            !groupId ||
+            !_users ||
+            !scope
+        )
             return
-        }
+        try {
+            setTxState(TransactionState.PREPARING_TRANSACTION)
 
-        const feedback = prompt("Please enter your feedback:")
-
-        if (feedback && _users) {
-            setLoading.on()
-
-            setLogs(`Posting your anonymous feedback...`)
-
-            try {
-                const group = new Group(groupId.toString(), 20, _users)
-
-                const signal = BigNumber.from(utils.formatBytes32String(feedback)).toString()
-
-                const { proof, merkleTreeRoot, nullifierHash } = await generateProof(
-                    _identity,
-                    group,
-                    groupId.toString(),
-                    signal
-                )
-
-                let response: any
-
-                // @ts-ignore
-                if (import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK) {
-                    // @ts-ignore
-                    response = await fetch(import.meta.env.VITE_OPENZEPPELIN_AUTOTASK_WEBHOOK, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            abi: Feedback.abi,
-                            // @ts-ignore
-                            address: import.meta.env.VITE_FEEDBACK_CONTRACT_ADDRESS,
-                            functionName: "sendFeedback",
-                            functionParameters: [signal, merkleTreeRoot, nullifierHash, proof]
-                        })
-                    })
-                } else {
-                    response = await fetch("api/feedback", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                            feedback: signal,
-                            merkleTreeRoot,
-                            nullifierHash,
-                            proof
-                        })
-                    })
-                }
-
-                if (response.status === 200) {
-                    addFeedback(feedback)
-
-                    setLogs(`Your feedback was posted 🎉`)
-                } else {
-                    setLogs("Some error occurred, please try again!")
-                }
-            } catch (error) {
-                console.error(error)
-
-                setLogs("Some error occurred, please try again!")
-            } finally {
-                setLoading.off()
+            const group = new Group(groupId.toString(), 20, _users)
+            const signal = keccak256(zkBillAddress)
+            const commitmentProof = await generateSemaphoreProof(_identity, group, scope, signal)
+            const gateKeeperProof = {
+                merkleTreeRoot: commitmentProof.merkleTreeRoot,
+                nullifierHash: commitmentProof.nullifierHash,
+                proof: commitmentProof.proof
             }
+
+            const { request } = await prepareWriteContract({
+                address: zkBillAddress,
+                abi: zkBillABI,
+                functionName: "claim",
+                args: [gateKeeperProof, processedProof]
+            })
+            setTxState(TransactionState.AWAITING_USER_APPROVAL)
+            const { hash } = await writeContract(request)
+            setTxState(TransactionState.AWAITING_TRANSACTION)
+            await waitForTransaction({
+                hash
+            })
+            alert("transaction completed!")
+        } catch (e) {
+            console.log(e)
+            alert(`Error: ${String(e)}`)
         }
-    }, [_identity])
+        setTxState(TransactionState.INITIAL)
+    }, [txState, zkBillAddress, processedProof, _identity, groupId, _users, scope])
 
     return (
         <>
             <Heading as="h2" size="xl">
-                Proofs
+                Contributors Club 💻
             </Heading>
-
-            <Text pt="2" fontSize="md">
-                Semaphore members can anonymously{" "}
-                <Link href="https://semaphore.pse.dev/docs/guides/proofs" color="primary.500" isExternal>
-                    prove
-                </Link>{" "}
-                that they are part of a group and that they are generating their own signals. Signals could be anonymous
-                votes, leaks, reviews, or feedback.
-            </Text>
-
+            <Stack spacing={2}>
+                <Text color="primary.500">
+                    But first you need to prove your a contributor. upload an email you rceived that shows your PR was
+                    merged into main. 📧
+                </Text>
+            </Stack>
             <Divider pt="5" borderColor="gray.500" />
-
             <HStack py="5" justify="space-between">
                 <Text fontWeight="bold" fontSize="lg">
-                    Feedback signals ({_feedback.length})
+                    Total Contributors ({_users ? _users.length : "..."})
                 </Text>
-                <Button leftIcon={<IconRefreshLine />} variant="link" color="text.700" onClick={refreshFeedback}>
+                <Button leftIcon={<IconRefreshLine />} variant="link" color="text.700" onClick={refreshUsers}>
                     Refresh
                 </Button>
             </HStack>
-
-            <Box pb="5">
-                <Button
-                    w="100%"
-                    fontWeight="bold"
-                    justifyContent="left"
-                    colorScheme="primary"
-                    px="4"
-                    onClick={sendFeedback}
-                    isDisabled={_loading}
-                    leftIcon={<IconAddCircleFill />}
-                >
-                    Send Feedback
-                </Button>
-            </Box>
-
-            {_feedback.length > 0 && (
-                <VStack spacing="3" align="left">
-                    {_feedback.map((f, i) => (
-                        <HStack key={i} p="3" borderWidth={1}>
-                            <Text>{f}</Text>
+            <EmailInput emailFull={emailFull} setEmailFull={setEmailFull} />
+            <Button
+                w="100%"
+                fontWeight="bold"
+                justifyContent="left"
+                px="4"
+                disabled={status === ZkProofStatus.GENERATING || txState === TransactionState.AWAITING_TRANSACTION}
+                onClick={() => {
+                    if (processedProof) {
+                        if (txState === TransactionState.INITIAL) {
+                            submitMailProof()
+                        }
+                    } else if (status === ZkProofStatus.INITIAL) {
+                        generateProof(emailFull)
+                    }
+                }}
+            >
+                {status === ZkProofStatus.INITIAL && "Generate Proof"}
+                {status === ZkProofStatus.GENERATING && "Preparing ZK proof..."}
+                {status === ZkProofStatus.READY && txState === TransactionState.INITIAL && "Proof ready! click to join"}
+                {txState === TransactionState.AWAITING_USER_APPROVAL && "Confirm transaction"}
+                {txState === TransactionState.AWAITING_TRANSACTION && "Waiting for transaction"}
+            </Button>
+            {_users && _users.length > 0 && (
+                <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
+                    {_users.map((user, i) => (
+                        <HStack key={i} p="3" borderWidth={1} whiteSpace="nowrap">
+                            <Text textOverflow="ellipsis" overflow="hidden">
+                                {user}
+                            </Text>
                         </HStack>
                     ))}
                 </VStack>
             )}
-
             <Divider pt="6" borderColor="gray" />
 
             <Stepper step={3} onPrevClick={() => navigate("/groups")} />

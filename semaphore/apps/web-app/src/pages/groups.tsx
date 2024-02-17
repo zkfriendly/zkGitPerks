@@ -1,9 +1,8 @@
-import { Button, Divider, Heading, Highlight, HStack, Stack, Text, VStack } from "@chakra-ui/react"
+import { Button, Divider, Heading, HStack, Stack, Text, VStack } from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { prepareWriteContract, waitForTransaction, writeContract } from "@wagmi/core"
-import AppButton from "../components/AppButton"
 import { useContractAddress } from "../hooks/useContractAddress"
 import { GATEKEEPER_CONTRACT_ADDRESS_MAP } from "../constants/addresses"
 import Stepper from "../components/Stepper"
@@ -16,7 +15,6 @@ import { gateKeeperABI } from "../abis/types/generated"
 import { TransactionState, ZkProofStatus } from "../types"
 import useZkEmail from "../hooks/useZkEmail"
 import EmailInput from "../components/EmailInput"
-import useRepositoryName from "../hooks/useRepositoryName"
 
 export default function GroupsPage() {
     const navigate = useNavigate()
@@ -46,7 +44,7 @@ export default function GroupsPage() {
 
     const [emailFull, setEmailFull] = useState("")
 
-    const { generateProof, processedProof, status } = useZkEmail({
+    const { generateProof, processedProof, status } = useZkEmail<readonly [bigint, bigint, bigint, bigint, bigint]>({
         circuitId: PR_CIRCUIT_ID,
         getProofInputs: getPrProofInputs,
         identity: _identity!
