@@ -13,7 +13,7 @@ export async function getPrProofInputs(emailFull: string, owner: string) {
 }
 
 export async function getBillProofInputs(emailFull: string, owner: string) {
-    return getProofInputs(emailFull, "Your payment of $ ", "Your payment of $ ", RevealType.BODY, 512, 512, owner)
+    return getProofInputs(emailFull, "Your payment of $ ", "Your payment of $ ", RevealType.BODY, 512, 2048, owner)
 }
 
 export async function getHerokuProofInputs(emailFull: string, owner: string) {
