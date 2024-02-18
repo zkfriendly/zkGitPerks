@@ -1,4 +1,4 @@
-import { Text, Textarea } from "@chakra-ui/react"
+import { Box, Stack, Text, Textarea, VStack } from "@chakra-ui/react"
 import React from "react"
 import DragAndDropTextBox from "../components/DragAndDropTextBox"
 
@@ -19,7 +19,7 @@ export default function EmailInput({
     }
 
     return (
-        <>
+        <Stack width={750}>
             <DragAndDropTextBox onFileDrop={onFileDrop} />
             <Text my={2} textAlign={"center"}>
                 or copy paste full PR email with headers bellow
@@ -31,6 +31,6 @@ export default function EmailInput({
                 value={emailFull}
                 onChange={(e) => setEmailFull(e.target.value)}
             ></Textarea>
-        </>
+        </Stack>
     )
 }

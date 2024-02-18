@@ -1,4 +1,17 @@
-import { Button, Divider, Heading, HStack, Stack, Text, VStack } from "@chakra-ui/react"
+import {
+    Button,
+    Divider,
+    Heading,
+    HStack,
+    Stack,
+    Text,
+    VStack,
+    Image,
+    ButtonGroup,
+    Highlight,
+    Box,
+    AbsoluteCenter
+} from "@chakra-ui/react"
 import { Identity } from "@semaphore-protocol/identity"
 import { useCallback, useContext, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
@@ -18,6 +31,7 @@ import { useGateKeeperContributorsGroupId, useZkBillGetScope, zkBillABI } from "
 import { TransactionState, ZkProofStatus } from "../types"
 import useZkEmail from "../hooks/useZkEmail"
 import EmailInput from "../components/EmailInput"
+import { Card, CardBody, CardFooter } from "@chakra-ui/card"
 
 export default function GroupsPage() {
     const navigate = useNavigate()
@@ -121,47 +135,41 @@ export default function GroupsPage() {
             </Stack>
             <Divider pt="5" borderColor="gray.500" />
             <HStack py="5" justify="space-between">
-                <Text fontWeight="bold" fontSize="lg">
-                    Total Contributors ({_users ? _users.length : "..."})
-                </Text>
-                <Button leftIcon={<IconRefreshLine />} variant="link" color="text.700" onClick={refreshUsers}>
-                    Refresh
-                </Button>
-            </HStack>
-            <EmailInput emailFull={emailFull} setEmailFull={setEmailFull} />
-            <Button
-                w="100%"
-                fontWeight="bold"
-                justifyContent="left"
-                px="4"
-                disabled={status === ZkProofStatus.GENERATING || txState === TransactionState.AWAITING_TRANSACTION}
-                onClick={() => {
-                    if (processedProof) {
-                        if (txState === TransactionState.INITIAL) {
-                            submitMailProof()
-                        }
-                    } else if (status === ZkProofStatus.INITIAL) {
-                        generateProof(emailFull)
-                    }
-                }}
-            >
-                {status === ZkProofStatus.INITIAL && "Generate Proof"}
-                {status === ZkProofStatus.GENERATING && "Preparing ZK proof..."}
-                {status === ZkProofStatus.READY && txState === TransactionState.INITIAL && "Proof ready! click to join"}
-                {txState === TransactionState.AWAITING_USER_APPROVAL && "Confirm transaction"}
-                {txState === TransactionState.AWAITING_TRANSACTION && "Waiting for transaction"}
-            </Button>
-            {_users && _users.length > 0 && (
-                <VStack spacing="3" px="3" align="left" maxHeight="300px" overflowY="scroll">
-                    {_users.map((user, i) => (
-                        <HStack key={i} p="3" borderWidth={1} whiteSpace="nowrap">
-                            <Text textOverflow="ellipsis" overflow="hidden">
-                                {user}
+                <Card maxW="l">
+                    <CardBody>
+                        <Image
+                            src="https://blog.ethereum.org/_ipx/w_1080,q_75/https%3A%2F%2Fstorage.googleapis.com%2Fethereum-hackmd%2Fupload_0ecdfe00edfb60b6c52af4cbdd81e461.jpg?url=https%3A%2F%2Fstorage.googleapis.com%2Fethereum-hackmd%2Fupload_0ecdfe00edfb60b6c52af4cbdd81e461.jpg&w=1080&q=75"
+                            alt="Green double couch with wooden legs"
+                            borderRadius="lg"
+                            height={200}
+                            width={800}
+                            objectFit="cover"
+                        />
+                        <Stack mt="6" spacing="3">
+                            <Heading size="lg">Devconnect Cowork Space</Heading>
+                            <Text>
+                                <Heading size="md" lineHeight="tall">
+                                    <Highlight
+                                        query={["one-time", "$ 15"]}
+                                        styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}
+                                    >
+                                        This is a one-time offer of $ 15 reimbursement for Devconnect coworking space,
+                                        which you can claim by providing the email you received for your purchase.
+                                    </Highlight>
+                                </Heading>
                             </Text>
-                        </HStack>
-                    ))}
-                </VStack>
-            )}
+                        </Stack>
+                    </CardBody>
+                    <Box position="relative" padding="5">
+                        <Divider />
+                        <AbsoluteCenter px="4">Claim</AbsoluteCenter>
+                    </Box>{" "}
+                    <CardFooter>
+                        <EmailInput />
+                    </CardFooter>
+                </Card>
+            </HStack>
+
             <Divider pt="6" borderColor="gray" />
 
             <Stepper step={3} onPrevClick={() => navigate("/groups")} />
