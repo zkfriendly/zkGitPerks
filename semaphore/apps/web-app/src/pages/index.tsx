@@ -39,7 +39,7 @@ export default function IdentitiesPage() {
 
     const createIdentity = useCallback(async () => {
         if (active) {
-            const message = `Sign this message to generate your Semaphore identity.`
+            const message = `sign this message to generate your Semaphore identity......`
             const identity = new Identity(await signMessageAsync({ message }))
 
             setIdentity(identity)

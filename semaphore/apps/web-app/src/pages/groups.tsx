@@ -143,7 +143,7 @@ export default function GroupsPage() {
             <Stepper
                 step={2}
                 onPrevClick={() => navigate("/")}
-                onNextClick={_identity && userHasJoined(_identity) ? () => navigate("/proofs") : undefined}
+                onNextClick={_identity ? () => navigate("/proofs") : undefined}
             />
         </>
     )
