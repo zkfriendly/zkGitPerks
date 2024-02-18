@@ -13,7 +13,7 @@ export async function getInputs(rawEmail: string, owner: string) {
   const STRING_PRESELECTOR = "Your payment of $ ";
   const TOTAL_CHARGE_SELECTOR = "Your payment of $ ";
   const MAX_HEADER_PADDED_BYTES = 512;
-  const MAX_BODY_PADDED_BYTES = 512;
+  const MAX_BODY_PADDED_BYTES = 2 * 1024;
 
   console.log("Verifying DKIM signature...");
 
@@ -48,7 +48,7 @@ export async function getInputs(rawEmail: string, owner: string) {
 
 (async function generateInputs() {
   const rawEmail = fs.readFileSync(
-    path.join(__dirname, "../../../emls/zkmail.eml"),
+    path.join(__dirname, "../../../emls/zkBillAli.eml"),
     "utf8"
   );
   const owner =

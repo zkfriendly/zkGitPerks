@@ -42,15 +42,15 @@ async function deployGateKeeper(semaphoreAddress: string, prVerifierAddress: str
 }
 
 async function deployZkBill() {
-    // const verifier = await deployVerifier("ZkBillVerifier")
-    const verifierAddress = "0x17798d86AFdAbc1010A95E2ae6DbaD187c89b55E"
-    const PackedUtilsFactory = await ethers.getContractFactory("PackedUtils")
-    const packedUtils = await PackedUtilsFactory.deploy()
-    await packedUtils.deployed()
-    console.info(`PackedUtils contract has been deployed to: ${packedUtils.address}`)
+    const verifier = await deployVerifier("ZkBillVerifier")
+    const verifierAddress = verifier.address
+    // const PackedUtilsFactory = await ethers.getContractFactory("PackedUtils")
+    // const packedUtils = await PackedUtilsFactory.deploy()
+    // await packedUtils.deployed()
+    // console.info(`PackedUtils contract has been deployed to: ${packedUtils.address}`)
     const ZkBillFactory = await ethers.getContractFactory("ZkBill", {
         libraries: {
-            PackedUtils: packedUtils.address
+            PackedUtils: packedUtils
         }
     })
     const zkBill = await ZkBillFactory.deploy(
@@ -85,6 +85,6 @@ async function deployHerokuBill() {
     console.info(`HerokuBill contract has been deployed to: ${zkBill.address}`)
 }
 
-deployHerokuBill()
+deployZkBill()
     .then(() => process.exit(0))
     .catch(console.log)

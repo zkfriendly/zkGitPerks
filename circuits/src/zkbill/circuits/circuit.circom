@@ -60,4 +60,4 @@ template ZkBill(max_header_bytes, max_body_bytes, n, k, pack_size, max_total_cha
     owner_out <== owner;
 }
 
-component main = ZkBill(512, 512, 121, 17, 31, 10);
+component main = ZkBill(512, 2048, 121, 17, 31, 10);

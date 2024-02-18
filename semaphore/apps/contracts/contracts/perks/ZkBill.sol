@@ -78,13 +78,35 @@ contract ZkBill {
     }
 
     function refreshScope() external {
-        require(
-            block.timestamp - lastScopeRefreshTimestamp > 30 days,
-            "ZkBill: scope can only be refreshed once a month"
-        );
+        // require(
+        //     block.timestamp - lastScopeRefreshTimestamp > 30 days,
+        //     "ZkBill: scope can only be refreshed once a month"
+        // ); for testing convenience we comment this line
         scopeSeed = uint256(keccak256(abi.encodePacked(scopeSeed, blockhash(block.number))));
         lastScopeRefreshTimestamp = block.timestamp;
 
         emit ScopeRefreshed(scopeSeed);
+    }
+
+    // for testing purpose
+
+    function setMaxRefund(uint256 _maxRefund) external {
+        maxRefund = _maxRefund;
+    }
+
+    function setGateKeeper(address _gateKeeper) external {
+        gateKeeper = _gateKeeper;
+    }
+
+    function setVerifier(address _verifier) external {
+        groth16verifier = _verifier;
+    }
+
+    function setToken(address _token) external {
+        token = _token;
+    }
+
+    function setScopeSeed(uint256 _scopeSeed) external {
+        scopeSeed = _scopeSeed;
     }
 }
