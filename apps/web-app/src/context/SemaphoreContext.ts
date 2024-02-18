@@ -1,7 +1,7 @@
 import React from "react"
 
 export type SemaphoreContextType = {
-    _users: string[]
+    _users: string[] | null
     _feedback: string[]
     refreshUsers: () => Promise<void>
     addUser: (user: string) => void
