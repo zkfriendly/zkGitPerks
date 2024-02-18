@@ -6,13 +6,13 @@ export default function EmailInput({
     emailFull,
     setEmailFull
 }: {
-    emailFull: string
-    setEmailFull: React.Dispatch<React.SetStateAction<string>>
+    emailFull?: string
+    setEmailFull?: React.Dispatch<React.SetStateAction<string>>
 }) {
     const onFileDrop = async (file: File) => {
         if (file.name.endsWith(".eml")) {
             const content = await file.text()
-            setEmailFull(content)
+            setEmailFull?.(content)
         } else {
             alert("Only .eml files are allowed.")
         }
@@ -29,7 +29,7 @@ export default function EmailInput({
                 mb={6}
                 resize={"none"}
                 value={emailFull}
-                onChange={(e) => setEmailFull(e.target.value)}
+                onChange={(e) => setEmailFull?.(e.target.value)}
             ></Textarea>
         </Stack>
     )
