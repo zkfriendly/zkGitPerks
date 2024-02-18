@@ -100,10 +100,11 @@ export default function GroupsPage() {
                 <EmailInput emailFull={emailFull} setEmailFull={setEmailFull} />
                 <div style={{ width: "100%", display: "flex", justifyContent: "flex-end" }}>
                     <Button
-                        mb={6}
+                        my={6}
                         fontWeight="bold"
                         justifyContent="left"
                         px="4"
+                        width={'100%'}
                         disabled={
                             status === ZkProofStatus.GENERATING || txState === TransactionState.AWAITING_TRANSACTION
                         }

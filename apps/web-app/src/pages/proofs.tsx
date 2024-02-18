@@ -36,7 +36,7 @@ import { Card, CardBody, CardFooter } from "@chakra-ui/card"
 export default function GroupsPage() {
     const navigate = useNavigate()
     const { setLogs } = useContext(LogsContext)
-    const { _users, refreshUsers } = useContext(SemaphoreContext)
+    const { _users } = useContext(SemaphoreContext)
     const [_identity, setIdentity] = useState<Identity>()
     const zkBillAddress = useContractAddress(ZKBILL_CONTRACT_ADDRESS_MAP)
     const gateKeeperAddress = useContractAddress(GATEKEEPER_CONTRACT_ADDRESS_MAP)
@@ -161,7 +161,14 @@ export default function GroupsPage() {
                         <VStack>
                             <EmailInput emailFull={emailFull} setEmailFull={setEmailFull} />
                             <Button
-                                width={800}
+                                my={6}
+                                fontWeight="bold"
+                                justifyContent="left"
+                                px="4"
+                                width={'100%'}
+                                disabled={
+                                    status === ZkProofStatus.GENERATING || txState === TransactionState.AWAITING_TRANSACTION
+                                }
                                 onClick={() => {
                                     if (processedProof) {
                                         if (txState === TransactionState.INITIAL) {
@@ -211,11 +218,8 @@ export default function GroupsPage() {
                     </CardBody>
                     <Box position="relative" padding="5">
                         <Divider />
-                        <AbsoluteCenter px="4">Claim</AbsoluteCenter>
+                        <AbsoluteCenter px="4">Not deployed yet</AbsoluteCenter>
                     </Box>{" "}
-                    <CardFooter>
-                        <EmailInput />
-                    </CardFooter>
                 </Card>
                 <Card maxW="l">
                     <CardBody>
@@ -245,11 +249,8 @@ export default function GroupsPage() {
                     </CardBody>
                     <Box position="relative" padding="5">
                         <Divider />
-                        <AbsoluteCenter px="4">Claim</AbsoluteCenter>
-                    </Box>{" "}
-                    <CardFooter>
-                        <EmailInput />
-                    </CardFooter>
+                        <AbsoluteCenter px="4">Not deployed yet</AbsoluteCenter>
+                    </Box>
                 </Card>
                 <Divider orientation="horizontal" />
             </VStack>
