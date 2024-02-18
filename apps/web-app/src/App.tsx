@@ -56,8 +56,8 @@ export default function App() {
                     <ColorMode/>
                 </HStack>
 
-                <Container maxW="800" flex="1" display="flex" paddingTop='2rem'>
-                    <Stack py="8" display="flex" width="100%">
+                <Container maxW="800" flex="1" display="flex" paddingTop="2rem">
+                    <Stack pb="8" display="flex" width="100%">
                         <SemaphoreContext.Provider value={semaphore}>
                             <LogsContext.Provider
                                 value={{
