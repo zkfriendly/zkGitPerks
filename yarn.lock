@@ -505,6 +505,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@chakra-ui/card@npm:^2.2.0":
+  version: 2.2.0
+  resolution: "@chakra-ui/card@npm:2.2.0"
+  dependencies:
+    "@chakra-ui/shared-utils": 2.0.5
+  peerDependencies:
+    "@chakra-ui/system": ">=2.0.0"
+    react: ">=18"
+  checksum: e8333b521cba8be8193dfb4784697942efc820890f8c89aa1484fab3fa7b69ababffea24eaecc331b1c901407b94f4a465113bf115ab965be1f87b913f31d53d
+  languageName: node
+  linkType: hard
+
 "@chakra-ui/checkbox@npm:2.2.3":
   version: 2.2.3
   resolution: "@chakra-ui/checkbox@npm:2.2.3"
@@ -1266,6 +1278,13 @@ __metadata:
   version: 2.0.2
   resolution: "@chakra-ui/shared-utils@npm:2.0.2"
   checksum: d3e00205dbfa613fbd161f4253d79e519522c100fdb0182ed25bb71ecf627342c876ff0fa2ba986b51aa3b457e73d28ebf8e91111bf4c031ed607e90d1225ace
+  languageName: node
+  linkType: hard
+
+"@chakra-ui/shared-utils@npm:2.0.5":
+  version: 2.0.5
+  resolution: "@chakra-ui/shared-utils@npm:2.0.5"
+  checksum: 7274b168bf188d1dc098d1f73a60676c6702454bd4dd9919f9b8447205bc1053b4faab6e38702f33cc25694f18bb598c39777f70b44dba221c078c839f42f2bd
   languageName: node
   linkType: hard
 
@@ -18846,6 +18865,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "web-app@workspace:apps/web-app"
   dependencies:
+    "@chakra-ui/card": ^2.2.0
     "@chakra-ui/react": ^2.3.7
     "@chakra-ui/theme": ^2.1.15
     "@chakra-ui/theme-tools": ^2.0.12
