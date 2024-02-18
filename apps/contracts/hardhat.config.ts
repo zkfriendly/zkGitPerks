@@ -94,8 +94,21 @@ const hardhatConfig: HardhatUserConfig = {
         target: "ethers-v5"
     },
     etherscan: {
-        apiKey: process.env.ETHERSCAN_API_KEY
-    }
+        apiKey: {
+            scrollSepolia: 'abc',
+        },
+        customChains: [
+            {
+            network: 'scrollSepolia',
+            chainId: 534351,
+            urls: {
+                apiURL: 'https://sepolia-blockscout.scroll.io/api',
+                browserURL: 'https://sepolia-blockscout.scroll.io/',
+                
+            },
+            },
+        ],
+    },
 }
 
 export default hardhatConfig
