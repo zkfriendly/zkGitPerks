@@ -24,17 +24,17 @@ template PrVerifier(max_header_bytes, max_body_bytes, n, k, pack_size, max_repo_
     var max_repo_name_packed = count_packed(max_repo_name_len, pack_size);
     signal output repo_name[max_repo_name_packed]; 
     
-    // component EV = EmailVerifier(max_header_bytes, max_body_bytes, n, k, 0);
-    // EV.in_padded <== in_padded;
-    // EV.pubkey <== pubkey;
-    // EV.signature <== signature;
-    // EV.in_len_padded_bytes <== in_len_padded_bytes;
-    // EV.body_hash_idx <== body_hash_idx;
-    // EV.precomputed_sha <== precomputed_sha;
-    // EV.in_body_padded <== in_body_padded;
-    // EV.in_body_len_padded_bytes <== in_body_len_padded_bytes;
+    component EV = EmailVerifier(max_header_bytes, max_body_bytes, n, k, 0);
+    EV.in_padded <== in_padded;
+    EV.pubkey <== pubkey;
+    EV.signature <== signature;
+    EV.in_len_padded_bytes <== in_len_padded_bytes;
+    EV.body_hash_idx <== body_hash_idx;
+    EV.precomputed_sha <== precomputed_sha;
+    EV.in_body_padded <== in_body_padded;
+    EV.in_body_len_padded_bytes <== in_body_len_padded_bytes;
     
-    // pubkey_hash <== EV.pubkey_hash;    
+    pubkey_hash <== EV.pubkey_hash;    
 
     // expose repo name
     signal (repo_name_out, repo_name_reveal[max_header_bytes]) <== SubjectRepoRegex(max_header_bytes)(in_padded);
