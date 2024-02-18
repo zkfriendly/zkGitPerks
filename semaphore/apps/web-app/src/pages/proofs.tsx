@@ -60,23 +60,19 @@ export default function GroupsPage() {
             setLogs(`${_users.length} user${_users.length > 1 ? "s" : ""} retrieved from the group 🤙🏽`)
         }
     }, [_users])
-    const userHasJoined = useCallback(
-        (identity: Identity) => _users?.includes(identity.commitment.toString()),
-        [_users]
-    )
 
     const [emailFull, setEmailFull] = useState("")
-
-    const { generateProof, processedProof, status } = useZkEmail<readonly [bigint, bigint, bigint, bigint]>({
-        circuitId: ZKBILL_CIRCUIT_ID,
-        getProofInputs: getBillProofInputs,
-        identity: _identity!
-    })
 
     const [txState, setTxState] = useState(TransactionState.INITIAL)
 
     const { data: scope } = useZkBillGetScope({
         address: zkBillAddress
+    })
+
+    const { generateProof, processedProof, status } = useZkEmail<readonly [bigint, bigint, bigint, bigint]>({
+        circuitId: ZKBILL_CIRCUIT_ID,
+        getProofInputs: getBillProofInputs,
+        identity: _identity!
     })
 
     const submitMailProof = useCallback(async () => {
@@ -147,7 +143,7 @@ export default function GroupsPage() {
                             <Text>
                                 <Heading size="md" lineHeight="tall">
                                     <Highlight
-                                        query={["$ 120", "once a month"]}
+                                        query={["$ 100", "once a month"]}
                                         styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}
                                     >
                                         You can receive a reimbursement of upto $ 100 each time for your Heroku bills
@@ -162,7 +158,29 @@ export default function GroupsPage() {
                         <AbsoluteCenter px="4">Claim</AbsoluteCenter>
                     </Box>{" "}
                     <CardFooter>
-                        <EmailInput />
+                        <VStack>
+                            <EmailInput emailFull={emailFull} setEmailFull={setEmailFull} />
+                            <Button
+                                width={800}
+                                onClick={() => {
+                                    if (processedProof) {
+                                        if (txState === TransactionState.INITIAL) {
+                                            submitMailProof()
+                                        }
+                                    } else if (status === ZkProofStatus.INITIAL) {
+                                        generateProof(emailFull)
+                                    }
+                                }}
+                            >
+                                {status === ZkProofStatus.INITIAL && "Generate Proof"}
+                                {status === ZkProofStatus.GENERATING && "Preparing ZK proof..."}
+                                {status === ZkProofStatus.READY &&
+                                    txState === TransactionState.INITIAL &&
+                                    "Proof ready! click to claim"}
+                                {txState === TransactionState.AWAITING_USER_APPROVAL && "Confirm transaction"}
+                                {txState === TransactionState.AWAITING_TRANSACTION && "Waiting for transaction"}
+                            </Button>
+                        </VStack>
                     </CardFooter>
                 </Card>
                 <Divider orientation="horizontal" />

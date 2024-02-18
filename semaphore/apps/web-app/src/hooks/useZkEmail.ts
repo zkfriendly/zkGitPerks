@@ -29,7 +29,11 @@ export default function useZkEmail<PubSignalType>({ identity, circuitId, getProo
 
     const generateProof = useCallback(
         async (emailFull: string) => {
-            if (!emailFull || status !== ZkProofStatus.INITIAL) return
+            if (!emailFull || status !== ZkProofStatus.INITIAL) {
+                console.log(emailFull, status)
+                console.log("No email or proof is already being generated")
+                return
+            }
             setStatus(ZkProofStatus.GENERATING)
 
             const data = {
