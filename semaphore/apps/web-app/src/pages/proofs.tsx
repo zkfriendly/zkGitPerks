@@ -125,16 +125,47 @@ export default function GroupsPage() {
     return (
         <>
             <Heading as="h2" size="xl">
-                Contributors Club 💻
+                Available Perks 🎁
             </Heading>
             <Stack spacing={2}>
-                <Text color="primary.500">
-                    But first you need to prove your a contributor. upload an email you received that shows your PR was
-                    merged into main. 📧
-                </Text>
+                <Text color="primary.500">You can choose from all the available perks and benefits here.</Text>
             </Stack>
             <Divider pt="5" borderColor="gray.500" />
-            <HStack py="5" justify="space-between">
+            <VStack py="5" justify="space-between">
+                <Card maxW="l">
+                    <CardBody>
+                        <Image
+                            src="https://www.heroku.com/packs/media/pricing-app/images/heroku-grows-with-you-77626ea1bd07f9212d6906219381c956.png"
+                            alt=""
+                            borderRadius="lg"
+                            height={200}
+                            width={800}
+                            objectFit="cover"
+                        />
+                        <Stack mt="6" spacing="3">
+                            <Heading size="lg">Heroku Bill</Heading>
+                            <Text>
+                                <Heading size="md" lineHeight="tall">
+                                    <Highlight
+                                        query={["$ 120", "once a month"]}
+                                        styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}
+                                    >
+                                        You can receive a reimbursement of upto $ 100 each time for your Heroku bills
+                                        once a month by providing the invoice you receive each month.
+                                    </Highlight>
+                                </Heading>
+                            </Text>
+                        </Stack>
+                    </CardBody>
+                    <Box position="relative" padding="5">
+                        <Divider />
+                        <AbsoluteCenter px="4">Claim</AbsoluteCenter>
+                    </Box>{" "}
+                    <CardFooter>
+                        <EmailInput />
+                    </CardFooter>
+                </Card>
+                <Divider orientation="horizontal" />
                 <Card maxW="l">
                     <CardBody>
                         <Image
@@ -168,7 +199,42 @@ export default function GroupsPage() {
                         <EmailInput />
                     </CardFooter>
                 </Card>
-            </HStack>
+                <Card maxW="l">
+                    <CardBody>
+                        <Image
+                            src="https://assets-global.website-files.com/631ad94cbdadc424bb3d6461/643c07ccaa88cbaad44212cf_TUM%20Blockchain%20Conference.png"
+                            alt=""
+                            borderRadius="lg"
+                            height={200}
+                            width={800}
+                            objectFit="cover"
+                        />
+                        <Stack mt="6" spacing="3">
+                            <Heading size="lg">TUM Blockchain Conference</Heading>
+                            <Text>
+                                <Heading size="md" lineHeight="tall">
+                                    <Highlight
+                                        query={["one-time", "$ 120"]}
+                                        styles={{ px: "2", py: "1", rounded: "full", bg: "teal.100" }}
+                                    >
+                                        This is a one-time offer of $ 120 reimbursement for TUM Blockchain Conference
+                                        ticket, which you can claim by providing the email you received for your
+                                        purchase.
+                                    </Highlight>
+                                </Heading>
+                            </Text>
+                        </Stack>
+                    </CardBody>
+                    <Box position="relative" padding="5">
+                        <Divider />
+                        <AbsoluteCenter px="4">Claim</AbsoluteCenter>
+                    </Box>{" "}
+                    <CardFooter>
+                        <EmailInput />
+                    </CardFooter>
+                </Card>
+                <Divider orientation="horizontal" />
+            </VStack>
 
             <Divider pt="6" borderColor="gray" />
 
