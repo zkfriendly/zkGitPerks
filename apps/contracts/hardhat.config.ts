@@ -15,6 +15,7 @@ import "./tasks/deploy"
 dotenvConfig({ path: resolve(__dirname, "../../.env") })
 dotenvConfig({ path: ".env" })
 
+
 function getNetworks(): NetworksUserConfig {
     if (!process.env.INFURA_API_KEY || !process.env.ETHEREUM_PRIVATE_KEY) {
         return {}
@@ -95,14 +96,14 @@ const hardhatConfig: HardhatUserConfig = {
     },
     etherscan: {
         apiKey: {
-            scrollSepolia: 'abc',
+            scrollSepolia: process.env.ETHERSCAN_API_KEY!,
         },
         customChains: [
             {
             network: 'scrollSepolia',
             chainId: 534351,
             urls: {
-                apiURL: 'https://sepolia-blockscout.scroll.io/api',
+                apiURL: 'https://api-sepolia.scrollscan.com/api',
                 browserURL: 'https://sepolia-blockscout.scroll.io/',
                 
             },
